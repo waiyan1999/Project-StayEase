@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Index {% endblock title %}
+
+
+{% block content %}
+
+
+<div class="messages">
+    {% if messages %}
+        {% for message in messages %}
+        
+      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+  <strong>Holy guacamole!</strong> {{ message }}
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
+<script>
+  setTimeout(function() {
+    var alert = document.querySelector('.alert');
+    if(alert){
+      var bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+      bsAlert.close();
+    }
+  }, 5000);
+</script>
+
+
+
+        {% endfor %}
+    {% endif %}
+</div>
+
+ <!-- Hero Section -->
+    <section class="hero d-flex align-items-center">
+        <div class="container text-center">
+            <h1 class="display-4 fw-bold mb-4">Find Your Perfect Stay</h1>
+            <p class="lead mb-5">Discover amazing houses and hostels for your next adventure</p>
+            
+            <div class="search-box p-3 mx-auto" style="max-width: 800px;">
+                <form class="row g-2">
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Where are you going?">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="date" class="form-control" placeholder="Check in">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="date" class="form-control" placeholder="Check out">
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select">
+                            <option>1 Guest</option>
+                            <option>2 Guests</option>
+                            <option>3+ Guests</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-primary w-100">Search</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold">Find Your Ideal Accommodation</h2>
+                <p class="text-muted">Browse through our curated selection of rental types</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="category-card">
+                        <i class="fas fa-home category-icon"></i>
+                        <h3>Entire Homes</h3>
+                        <p class="text-muted">Private homes with all amenities</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="category-card">
+                        <i class="fas fa-building category-icon"></i>
+                        <h3>Apartments</h3>
+                        <p class="text-muted">Modern city apartments</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="category-card">
+                        <i class="fas fa-bed category-icon"></i>
+                        <h3>Hostel Rooms</h3>
+                        <p class="text-muted">Budget-friendly stays</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="category-card">
+                        <i class="fas fa-tree category-icon"></i>
+                        <h3>Unique Stays</h3>
+                        <p class="text-muted">Extraordinary places</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% comment %}
+    <!-- Featured Properties -->
+    <section class="py-5 bg-white">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold">Featured Properties</h2>
+                <p class="text-muted">Top-rated accommodations loved by our community</p>
+            </div>
+            
+            <div class="row g-4">
+                <!-- Property 1 -->
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="card-img-top" alt="Apartment">
+                        <div class="card-body">
+                            <div class="text-warning mb-2">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                                <span class="text-muted">(128)</span>
+                            </div>
+                            <h5 class="card-title">Modern Downtown Apartment</h5>
+                            <p class="text-muted">
+                                <i class="fas fa-map-marker-alt"></i> New York
+                            </p>
+                            <div class="d-flex flex-wrap gap-3 my-3">
+                                <span><i class="fas fa-bed text-primary"></i> 2 beds</span>
+                                <span><i class="fas fa-bath text-primary"></i> 1 bath</span>
+                                <span><i class="fas fa-wifi text-primary"></i> WiFi</span>
+                            </div>
+                            <div class="property-price fs-4 my-3">$129 <span class="text-muted fs-6 fw-normal">/ night</span></div>
+                            <a href="#" class="btn btn-primary w-100">View Details</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Property 2 -->
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="card-img-top" alt="Beach House">
+                        <div class="card-body">
+                            <div class="text-warning mb-2">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <span class="text-muted">(94)</span>
+                            </div>
+                            <h5 class="card-title">Beachfront Villa</h5>
+                            <p class="text-muted">
+                                <i class="fas fa-map-marker-alt"></i> Miami
+                            </p>
+                            <div class="d-flex flex-wrap gap-3 my-3">
+                                <span><i class="fas fa-bed text-primary"></i> 4 beds</span>
+                                <span><i class="fas fa-bath text-primary"></i> 3 baths</span>
+                                <span><i class="fas fa-swimming-pool text-primary"></i> Pool</span>
+                            </div>
+                            <div class="property-price fs-4 my-3">$345 <span class="text-muted fs-6 fw-normal">/ night</span></div>
+                            <a href="#" class="btn btn-primary w-100">View Details</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Property 3 -->
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <img src="https://images.unsplash.com/photo-1554995207-c18c203602cb?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="card-img-top" alt="Hostel">
+                        <div class="card-body">
+                            <div class="text-warning mb-2">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                                <span class="text-muted">(217)</span>
+                            </div>
+                            <h5 class="card-title">Urban Hostel</h5>
+                            <p class="text-muted">
+                                <i class="fas fa-map-marker-alt"></i> Berlin
+                            </p>
+                            <div class="d-flex flex-wrap gap-3 my-3">
+                                <span><i class="fas fa-bed text-primary"></i> 1 bed</span>
+                                <span><i class="fas fa-utensils text-primary"></i> Kitchen</span>
+                                <span><i class="fas fa-users text-primary"></i> Social</span>
+                            </div>
+                            <div class="property-price fs-4 my-3">$45 <span class="text-muted fs-6 fw-normal">/ night</span></div>
+                            <a href="#" class="btn btn-primary w-100">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-5">
+                <a href="#" class="btn btn-outline-primary">View All Properties</a>
+            </div>
+        </div>
+    </section>
+    {% endcomment %}
+
+    <!-- Host Section -->
+    <section class="py-5 host-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h2 class="fw-bold mb-4">Become a StayEase Host</h2>
+                    <p class="mb-4">Join thousands of hosts who are earning extra income by renting their space.</p>
+                    
+                    <div class="d-flex mb-4">
+                        <div class="step-number me-3">1</div>
+                        <div>
+                            <h5>Create Your Listing</h5>
+                            <p class="text-muted">Add property details and photos</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex mb-4">
+                        <div class="step-number me-3">2</div>
+                        <div>
+                            <h5>Set Your Price</h5>
+                            <p class="text-muted">Control your rates and discounts</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex mb-4">
+                        <div class="step-number me-3">3</div>
+                        <div>
+                            <h5>Welcome Guests</h5>
+                            <p class="text-muted">We handle bookings and payments</p>
+                        </div>
+                    </div>
+                    
+                    <a href="#" class="btn btn-secondary">Start Hosting</a>
+                </div>
+                <div class="col-lg-6 mt-4 mt-lg-0">
+                    <img src="https://images.unsplash.com/photo-1560448204-603b3fc33ddc?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="img-fluid rounded shadow" alt="Hosting">
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}

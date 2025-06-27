@@ -1,0 +1,20 @@
+{% extends 'login-register-base.html' %}
+{% load static %}
+{% block title %} Register {% endblock title %}
+
+{% block content %}
+<div class="container col-md-6 mx-auto ">
+    <h1>This is Register Form</h1>
+
+    <form action="" method="post">
+        {% csrf_token %}
+
+        {{ register_form.as_p }}
+
+        <a href="{% url 'login_user' %}" class="btn btn-outline-secondary">Login</a>
+        <input type="submit" name="" id="" value="Register"  class="btn btn-primary" >
+    </form>
+
+
+</div>
+{% endblock content %}

@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Region{% endblock title %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+            <h1 class="text-center mb-5 fw-bold">Manage Regions & Cities</h1>
+
+            <!-- Region Form -->
+            <div class="card mb-4 shadow-sm rounded">
+                <div class="card-header bg-primary text-white fw-semibold">
+                    Add a New Region
+                </div>
+                <div class="card-body">
+                    <form method="post" class="row g-3">
+                        {% csrf_token %}
+                        <div class="col-12 col-md-8">
+                            {{ region_form.as_p }}
+                        </div>
+                        <div class="col-12 col-md-4 d-flex align-items-end">
+                            <button type="submit" name="add_region" class="btn btn-primary w-100">Add Region</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Region View -->
+            <div class="card mb-4 shadow-sm rounded">
+                <div class="card-header bg-success text-white fw-semibold">
+                    Region List
+                </div>
+                <div class="card-body">
+                    {% if regions %}
+                        <ul class="list-group list-group-flush">
+                            {% for region in regions %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><strong>Region:</strong> {{ region.name }}</span>
+                                    <span>
+                                        <button class="btn btn-outline-warning btn-sm me-2">Edit</button>
+                                        <a href="{% url 'delete_region' region.id %}" class="btn btn-outline-danger btn-sm">Delete</a>
+                                    </span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted mb-0">There is no Region here.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- City Form -->
+            <div class="card mb-4 shadow-sm rounded">
+                <div class="card-header bg-primary text-white fw-semibold">
+                    Add a New City
+                </div>
+                <div class="card-body">
+                    <form method="post" class="row g-3">
+                        {% csrf_token %}
+                        <div class="col-12 col-md-8">
+                            {{ city_form.as_p }}
+                        </div>
+                        <div class="col-12 col-md-4 d-flex align-items-end">
+                            <button type="submit" name="add_city" class="btn btn-primary w-100">Add City</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- City View -->
+            <div class="card shadow-sm rounded">
+                <div class="card-header bg-success text-white fw-semibold">
+                    City List
+                </div>
+                <div class="card-body">
+                    {% if cities %}
+                        <ul class="list-group list-group-flush">
+                            {% for city in cities %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><strong>{{ city.region.name }}</strong> / {{ city.name }}</span>
+                                    <span>
+                                        <button class="btn btn-outline-warning btn-sm me-2">Edit</button>
+                                        <a href="{% url 'delete_city' city.id  %}" class="btn btn-outline-danger btn-sm">Delete</a>
+                                    </span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted mb-0">There is no City here.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

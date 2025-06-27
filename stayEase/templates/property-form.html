@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Property Form {% endblock title %}
+
+{% block content %}
+
+<div class="property-form">
+    <form action="{% url 'property_create' %}" method="post">
+        {% csrf_token %}
+
+        {{form.as_p }} <br>
+
+        <input type="reset" name="" id="" value="Cancel" class="btn btn-outline-warning" >
+
+        <input type="submit" value="Submit" class="btn btn-outline-primary" >
+
+         
+    </form>
+</div>
+
+{% endblock content %}
