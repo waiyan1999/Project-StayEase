@@ -19,13 +19,36 @@ from django.db.models import Count, Avg
 from django.db.models.functions import Lower
 from myapp.models import Property, CustomUser, Review
 
+from django.views import View
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from django.http import JsonResponse
+from .models import SaveProperty, Property, CustomUser
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Property, Inquiry, Review
+from myapp.form import PropertyForm  # Ensure this import exists
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from .models import Property, Inquiry, Review
+from .form import PropertyForm
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from .models import Property, Inquiry, Review
+from .form import PropertyForm
+
 def base(request):
     return render(request, 'base.html')
    
 
 def index(request):
     # Check user type using a more reliable approach
-    if hasattr(request.user, 'role') and request.user.role == 'CUSTOMER':
+    if request.user.role == 'CUSTOMER':
       
         messages.info(request, f'Welcome {request.user.username}')
         
@@ -106,43 +129,20 @@ def index(request):
         return render(request, 'index.html', context)
     
     # Handle other user types
-    elif hasattr(request.user, 'role') and request.user.role == 'AGENCY':
+    elif request.user.role == 'AGENCY':
         return redirect('agency_dashboard')
     
-    elif hasattr(request.user, 'role') and request.user.role == 'ADMIN':
-        return redirect('admin_dashboard')
+    elif request.user.role == 'OWNER':
+        return redirect('agency_dashboard')
     
-    # Default case (admin or unknown)
-    return redirect('login_user')  # Fixed typo in URL name
-
-# class PropertyView(View):
-#     def get(self, request):
-#         propertyForm = PropertyForm()
-#         active_properties = Property.objects.filter(is_active=True)
-#         context = {'active_properties': active_properties, 'form': propertyForm}
-#         return render(request, 'property.html', context=context)
+    elif request.user.role == 'ADMIN':
+        return redirect('admindashobard')
     
-#     def post(self, request):
-#         propertyForm = PropertyForm(request.POST, request.FILES)
-#         if propertyForm.is_valid():
-#             property = propertyForm.save(commit=False)
-#             property.posted_by = request.user  # ✅ Set the posted_by field
-#             property.save()
-#             print("Successfully Created New Property")
-#         else:
-#             print("Error Creating New Property")
-#         return redirect('property')
     
-# def adminDashboard(request):
-#     if request.user.is_authenticated:
-#         return render(request,'admin-dashboard.html')
+    return redirect('login_user')  
 
 
 
-
-
-
-@staff_member_required
 def admin_dashboard(request):
     # Stats data
     total_users = CustomUser.objects.count()
@@ -189,11 +189,6 @@ def admin_dashboard(request):
     print(f'pendign properties {pending_properties}')
     
     return render(request, 'admin-dashboard.html', context)
-
-
-
-
-
 
 
 
@@ -365,10 +360,6 @@ class LocationView(View):
         return redirect('location')
 
 
-# class ServiceView(View):
-#     def get(self, request):
-#         return render(request, 'service.html')
-
 def login_user(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -386,16 +377,17 @@ def login_user(request):
                 return redirect('index')
             
             elif request.user.role == 'AGENCY':
-                return redirect('agency_dashboard')
+                return redirect('agencydashboard')
             
             else : 
-                return render (request,'admin-dashboard.html')
+                return redirect('admindashobard')
             
             
         else:
             print("Error Login")
             print(username,password)
             messages.error(request, 'Invalid credentials. Please try again.')
+            
     return render(request, 'loginUser.html')
 
 def logout_user(request):
@@ -418,10 +410,6 @@ def register_user(request):
 
 
     
-
-
-
-
 class ProfileView(View):
     def get_profile_context(self, user):
         profile = None
@@ -495,40 +483,9 @@ class ProfileView(View):
         })
         
 
-# class SavePropertyView(View):
-#     def get(self,request,pk):
-#         user_id = request.user.id
-        
-#         user_obj = get_object_or_404(CustomUser,id=user_id)
-        
-#         property_obj = get_object_or_404(Property,id=pk)
-        
-#         if not SaveProperty.objects.filter(user=user_obj,property=property_obj).exists():
-#             SaveProperty.objects.create(user=user_obj,property=property_obj)
-#             print(user_obj,property_obj,'Successfully Save')
-#             messages.success(request, "Inquiry sent successfully!")
-#         else:
-#             print(user_obj,property_obj,"Already Exists")
-#             messages.warning(request, "You have already sent an inquiry for this property.")
-        
-        
-#         return redirect('property')
-    
-#     def post(self,request,pk):
-#         pass
-
-
-
-from django.views import View
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib import messages
-from django.http import JsonResponse
-from .models import SaveProperty, Property, CustomUser
 
 
 class SavePropertyView(View):
-    
-    
     def post(self, request, pk):
         if not request.user.is_authenticated:
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -679,22 +636,7 @@ def payment(request, pk):  # `pk` is the Inquiry ID
     return redirect('profile')
 
 
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from .models import Property, Inquiry, Review
-from myapp.form import PropertyForm  # Ensure this import exists
 
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from .models import Property, Inquiry, Review
-from .form import PropertyForm
-
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from .models import Property, Inquiry, Review
-from .form import PropertyForm
 
 @login_required
 def agencyDashboard(request):
@@ -788,22 +730,7 @@ def agencyDashboard(request):
     }
     
     return render(request, 'agency-dashboard.html', context)        
-    #     form = InquiryForm(request.POST)
-    #     if form.is_valid():
-    #         inquiry = form.save(commit=False)
-    #         inquiry.customer = request.user
-    #         inquiry.save()
-    #         return redirect('inquiry_sent')  # You can customize this
-    # else:
-    #     form = InquiryForm()
-    # return render(request, 'inquiry/send_inquiry.html', {'form': form})
 
-# def approveInquiry(request,inquiry_id):
-#     inquiry = get_object_or_404(Inquiry,id=inquiry_id)
-    
-#     if request.method == 'POST':
-#         inquiry.approve()
-#         return redirect('inquiry_list')
 
 
 

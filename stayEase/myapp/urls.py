@@ -24,7 +24,7 @@ urlpatterns = [
     
     path('porfile/',views.ProfileView.as_view(),name='profile'),
     
-    path('admin-dashboard/',views.admin_dashboard,name='admin_dashobard'),
+    path('admin-dashboard/',views.admin_dashboard,name='admindashobard'),
 
     path('save-property/<int:pk>/',views.SavePropertyView.as_view(),name='save_property'),
     
