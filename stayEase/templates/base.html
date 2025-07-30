@@ -3,205 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>
-        {% block title %} StayEase - Find Your Perfect Stay {% endblock title %}
-    </title>
+    <title> StayEase | {% block title %}{% endblock %}</title>
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
-        :root {
-            --primary: #1E3A8A;        /* Navy Blue */
-            --primary-light: #3B82F6;  /* Bright Blue */
-            --primary-bright: #2563EB; /* Vibrant Blue */
-            --accent: #10B981;         /* Teal */
-            --secondary: #F59E0B;      /* Yellow */
-            --light: #EFF6FF;          /* Light Blue */
-            --dark: #1F2937;           /* Dark Gray */
-            --text: #374151;           /* Text Color */
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --radius: 8px;
-        }
-        
-        body {
-            background-color: var(--light);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: var(--text);
-        }
-        
-        .btn-primary {
-            background-color: var(--primary-bright);
-            border-color: var(--primary-bright);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background-color: var(--primary);
-            border-color: var(--primary);
-        }
-        
-        .btn-secondary {
-            background-color: var(--secondary);
-            border-color: var(--secondary);
-            color: var(--dark);
-        }
-        
-        .btn-outline-primary {
-            border-color: var(--primary-bright);
-            color: var(--primary-bright);
-        }
-        
-        .btn-outline-primary:hover {
-            background-color: var(--primary-bright);
-            color: white;
-        }
-        
-        .navbar {
-            background-color: white !important;
-            box-shadow: var(--shadow);
-        }
-        
-        .navbar-brand {
-            color: var(--primary) !important;
-            font-weight: 700;
-        }
-        
-        .hero {
-            background: linear-gradient(rgba(30, 58, 138, 0.8), rgba(30, 58, 138, 0.8)), 
-                        url('https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80') no-repeat center center/cover;
-            height: 80vh;
-            color: white;
-        }
-        
-        .search-box {
-            background-color: rgba(255, 255, 255, 0.95);
-            border-radius: var(--radius);
-        }
-        
-        .card {
-            transition: transform 0.3s ease;
-            border: none;
-            box-shadow: var(--shadow);
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .category-card {
-            text-align: center;
-            padding: 30px 20px;
-            border-radius: var(--radius);
-            transition: all 0.3s ease;
-            background-color: white;
-        }
-        
-        .category-card:hover {
-            background-color: var(--light);
-            transform: translateY(-5px);
-        }
-        
-        .category-icon {
-            color: var(--primary-bright);
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-        
-        .property-price {
-            color: var(--primary-bright);
-            font-weight: 700;
-        }
-        
-        .host-section {
-            background-color: white;
-        }
-        
-        .testimonial-card {
-            background-color: white;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-        }
-        
-        .step-number {
-            background-color: var(--primary-bright);
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-        }
-        
-        footer {
-            background-color: var(--dark);
-            color: white;
-        }
-        
-        .footer-heading {
-            position: relative;
-            padding-bottom: 10px;
-        }
-        
-        .footer-heading::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            bottom: 0;
-            width: 40px;
-            height: 3px;
-            background-color: var(--primary-light);
-        }
-        
-        .social-icon {
-            width: 40px;
-            height: 40px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            color: white;
-            transition: all 0.3s ease;
-        }
-        
-        .social-icon:hover {
-            background-color: var(--primary-light);
-            transform: translateY(-3px);
-        }
-    </style>
+
+    .save-property-btn.active {
+    background-color: #ffc107;
+    color: #212529;
+    border-color: #ffc107;
+    }
+
+    .save-property-btn.active .fa-bookmark {
+    font-weight: 900; /* Solid icon when saved */
+    }
+    
+    
+
+     .form-label {
+        font-size: 0.9rem;
+        margin-bottom: 0.3rem;
+    }
+    .form-select {
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        padding: 0.5rem 1rem;
+        transition: all 0.3s ease;
+    }
+    .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    .btn-primary {
+        padding: 0.5rem;
+        border-radius: 8px;
+    }
+    .btn-outline-secondary {
+        border-radius: 8px;
+        padding: 0.5rem 1.5rem;
+    }
+
+    .rating-input {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+    }
+    .rating-input input {
+        display: none;
+    }
+    .rating-input label {
+        font-size: 2rem;
+        color: #ddd;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+    .rating-input input:checked ~ label,
+    .rating-input label:hover,
+    .rating-input label:hover ~ label {
+        color: #ffc107;
+    }
+    .rating-input input:checked + label {
+        color: #ffc107;
+    }
+    .sticky-top {
+        position: -webkit-sticky;
+        position: sticky;
+        z-index: 1020;
+    }
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.2s;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+    }
+</style>
+
 </head>
 <body>
 
-    <div class="container-fluid">
-
-   {% if user.is_authenticated %}
-
-    <!-- Navbar -->
-    {% include 'nav-bar.html' %}
-   
-
     
-    {% block content %}
-    {% endblock content %}
 
-    {% else %}
 
-        {% include 'login.html' %}
-        
 
+<!-- Toast-Message -->
+<div aria-live="polite" aria-atomic="true" class="position-relative">
+  <div class="toast-container top-0 end-0 p-3">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="toast align-items-center text-bg-{{ message.tags }} border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="4000">
+          <div class="d-flex">
+            <div class="toast-body">
+              {{ message }}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+        </div>
+      {% endfor %}
     {% endif %}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+    toastElList.forEach(function (toastEl) {
+      var toast = new bootstrap.Toast(toastEl);
+      toast.show();
+    });
+  });
+</script>
 
 
+     
 
-    </div>
+<!-- Page Content -->
     
+<div >
+    {% block content %}{% endblock %}
+</div>
+    
+
+
    
+   
+
+    
+    
+
+    <!-- Bootstrap JS Bundle (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
+ 
+
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+const csrftoken = getCookie('csrftoken');
+
+function saveProperty(event, propertyId, userId) {
+    event.preventDefault();
+
+    console.log(propertyId,userId)
+
+
+    const url = `/api/saved-properties/`;  // Adjust to your API logic
+    const method = 'POST';
+
+    fetch(url, {
+        method: method,
+        headers: {
+            'X-CSRFToken': csrftoken,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            user: userId,
+            property: propertyId
+        })
+    })
+    .then(response => {
+        if (response.ok) {
+            alert("Successful Save")
+            location.reload();
+
+        } else {
+            alert('Something went wrong. Try again.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error occurred. Please try again.');
+    });
+}
+
+
+
+function unSaveProperty(event,savedId) {
+  event.preventDefault(); // prevent page reload
+
+  console.log(savedId)
+
+  fetch(`/api/saved-properties/${savedId}/`, {
+    method: 'DELETE',
+    headers: {
+      'X-CSRFToken': csrftoken
+    }
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error("Failed to unsave property.");
+    }
+    alert(`Property  unsaved successfully.`);
+    // Optionally: remove the property card from DOM or refresh
+    location.reload();
+  })
+  .catch(error => {
+    console.error("Error unsaving property:", error);
+    alert("Something went wrong.");
+  });
+}
+
+</script>
 
 </body>
-</html>  
+</html>

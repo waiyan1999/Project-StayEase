@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Navigation -->
+{% include 'base/nav-bar.html' %}
+
+<!-- Services Section -->
+    <section id="services" class="py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold">Our Services</h2>
+                <p class="text-muted">Comprehensive real estate solutions tailored to your needs</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="text-center p-4 h-100">
+                        <div class="feature-icon">
+                            <i class="bi bi-house-check"></i>
+                        </div>
+                        <h4>Property Management</h4>
+                        <p class="text-muted">Full-service property management for landlords including tenant screening, maintenance coordination, and rent collection.</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="text-center p-4 h-100">
+                        <div class="feature-icon">
+                            <i class="bi bi-search-heart"></i>
+                        </div>
+                        <h4>Tenant Placement</h4>
+                        <p class="text-muted">Strategic marketing and thorough screening to help you find qualified tenants quickly and minimize vacancy periods.</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="text-center p-4 h-100">
+                        <div class="feature-icon">
+                            <i class="bi bi-piggy-bank"></i>
+                        </div>
+                        <h4>Financial Analysis</h4>
+                        <p class="text-muted">Comprehensive ROI projections and market analysis to help you maximize your rental property investment.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+<!-- Footer -->
+{% include 'base/footer.html' %}
+
+{% endblock content %}

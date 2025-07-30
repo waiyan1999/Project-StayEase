@@ -1,126 +1,400 @@
 {% extends 'base.html' %}
-{% load static %}
+{% block title %}Property Detail - {{ property.name }}{% endblock title %}
+
 {% block content %}
 
-<div class="container mt-5">
-    <h1 class="mb-4 text-center">{{ property.name }}</h1>
-    
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card">
-                <img src="" alt="{{ property.name }}" class="card-img-top img-fluid">
-                <div id="carouselExampleCaptions" class="carousel slide">
-  <div class="carousel-indicators">
-    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1" aria-label="Slide 2"></button>
-    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2" aria-label="Slide 3"></button>
-  </div>
-  <div class="carousel-inner">
-    <div class="carousel-item active">
-      <img src="{{ property.main_photo.url }}" class="d-block w-100" alt="...">
-      <div class="carousel-caption d-none d-md-block">
-        <h5>First slide label</h5>
-        <p>Some representative placeholder content for the first slide.</p>
-      </div>
-    </div>
+<!-- Navigation -->
+{% include 'base/nav-bar.html' %}
 
-    {% if property.bed_photo %}
-    <div class="carousel-item">
-      <img src="{{ property.bed_photo.url }}" class="d-block w-100" alt="...">
-      <div class="carousel-caption d-none d-md-block">
-        <h5> Bed  </h5>
-        <p>Some representative placeholder content for the second slide sjdhlerjklkwjerwlkejrlkerj.</p>
-      </div>
-    </div>
-    {% endif %}
-
-    {% if property.bath_photo %}
-    <div class="carousel-item">
-      <img src="{{ property.bath_photo.url }}" class="d-block w-100" alt="...">
-      <div class="carousel-caption d-none d-md-block">
-        <h5> Bath </h5>
-        <p>Some representative placeholder content for the third slide.</p>
-      </div>
-    </div>
-    {% endif %}
-
-     {% if property.pool_photo %}
-    <div class="carousel-item">
-      <img src="{{ property.pool_photo.url }}" class="d-block w-100" alt="...">
-      <div class="carousel-caption d-none d-md-block">
-        <h5> Swimming Pool </h5>
-        <p>Some representative placeholder content for the third slide.</p>
-      </div>
-    </div>
-    {% endif %}
-
-    {% if property.kitchen_photo %}
-    <div class="carousel-item">
-      <img src="{{ property.pool_photo.url }}" class="d-block w-100" alt="...">
-      <div class="carousel-caption d-none d-md-block">
-        <h5> Kitchen </h5>
-        <p>Some representative placeholder content for the third slide.</p>
-      </div>
-    </div>
-    {% endif %}
-
-  </div>
-  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Previous</span>
-  </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Next</span>
-  </button>
-</div>
+<div class="container py-1">
+    <!-- Property Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-5 fw-bold">{{ property.name }}</h1>
+            <div class="d-flex align-items-center gap-3 mb-2">
+                <span class="badge bg-primary">{{ property.get_property_type_display }}</span>
+                <span class="badge 
+                    {% if property.status == 'AVAILABLE' %}bg-success
+                    {% elif property.status == 'BOOKED' %}bg-warning
+                    {% elif property.status == 'RENTED' %}bg-secondary
+                    {% else %}bg-danger{% endif %}">
+                    {{ property.get_status_display }}
+                </span>
+                {% if property.is_featured %}
+                <span class="badge bg-danger"><i class="bi bi-star-fill"></i> Featured</span>
+                {% endif %}
             </div>
+            <p class="lead">{{ property.city.name }}, {{ property.region.name }}</p>
         </div>
-        <div class="col-md-6">
-            <div class="card">
+        <div class="col-md-4 text-md-end">
+            <h2 class="text-primary">${{ property.rent_amount }} 
+                <small class="text-muted fs-6">/ {{ property.get_rent_type_display }}</small>
+            </h2>
+            <p class="text-muted">Security Deposit: ${{ property.security_deposit }}</p>
+        </div>
+    </div>
+
+    <!-- Main Property Image -->
+    <div class="card mb-4 border-0 shadow-sm">
+        <img src="{{ property.primary_image.url }}" class="card-img-top rounded-top" alt="{{ property.name }}" style="max-height: 500px; object-fit: cover;">
+        {% if property.image_caption %}
+        <div class="card-footer bg-light py-2">
+            <p class="text-muted mb-0"><small>{{ property.image_caption }}</small></p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Property Details Section -->
+    <div class="row">
+        <!-- Main Details -->
+        <div class="col-lg-8">
+            <!-- Description -->
+            <div class="card mb-4">
                 <div class="card-body">
-                    <h3 class="card-title">Details</h3>
-                    <p><strong>Type:</strong> {{ property.get_type_display }}</p>
-                    <p><strong>Beds:</strong> {{ property.beds }}</p>
-                    <p><strong>Baths:</strong> {{ property.bath }}</p>
-                    <p><strong>Rent Type:</strong> {{ property.get_rent_type_display }}</p>
-                    <p><strong>Rent Amount:</strong> ${{ property.rent_amount }}</p>
-                    <p><strong>Address:</strong> {{ property.address }}</p>
-                    <p><strong>Posted By:</strong> {{ property.posted_by.username }}</p>
-                    <p><strong>Status:</strong> {{ property.get_status_display }}</p>
-                    <p><strong>Posted At:</strong> {{ property.posted_at }}</p>
+                    <h3 class="card-title">Description</h3>
+                    <p class="card-text">{{ property.description }}</p>
+                </div>
+            </div>
+
+            <!-- Amenities -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title mb-4">Amenities</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><i class="bi bi-door-closed me-2"></i> Bedrooms</span>
+                                    <span class="badge bg-primary rounded-pill">{{ property.beds }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><i class="bi bi-bucket me-2"></i> Bathrooms</span>
+                                    <span class="badge bg-primary rounded-pill">{{ property.baths }}</span>
+                                </li>
+                                {% if property.area_sqft %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span><i class="bi bi-arrows-fullscreen me-2"></i> Area</span>
+                                    <span class="badge bg-primary rounded-pill">{{ property.area_sqft }} sq.ft.</span>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <i class="bi bi-wifi me-2"></i> WiFi 
+                                    <span class="float-end">
+                                        {% if property.has_wifi %}<i class="bi bi-check-circle-fill text-success"></i>{% else %}<i class="bi bi-x-circle-fill text-danger"></i>{% endif %}
+                                    </span>
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="bi bi-water me-2"></i> Swimming Pool 
+                                    <span class="float-end">
+                                        {% if property.has_pool %}<i class="bi bi-check-circle-fill text-success"></i>{% else %}<i class="bi bi-x-circle-fill text-danger"></i>{% endif %}
+                                    </span>
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="bi bi-egg-fried me-2"></i> Kitchen 
+                                    <span class="float-end">
+                                        {% if property.has_kitchen %}<i class="bi bi-check-circle-fill text-success"></i>{% else %}<i class="bi bi-x-circle-fill text-danger"></i>{% endif %}
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Location & Map -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title mb-4">Location</h3>
+                    <p class="card-text mb-3">
+                        <i class="bi bi-geo-alt-fill me-2 text-primary"></i> 
+                        {{ property.address }}, {{ property.city.name }}, {{ property.region.name }}
+                    </p>
+                    
+                    {% if property.latitude and property.longitude %}
+                    <div class="ratio ratio-16x9 mb-3">
+                        <iframe 
+                            src="https://maps.google.com/maps?q={{ property.latitude }},{{ property.longitude }}&hl=es;z=14&amp;output=embed" 
+                            style="border:0; border-radius: 8px;" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning">Location map is not available for this property</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Reviews Section -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title mb-4">Reviews</h3>
+                    
+                    {% if property.reviews %}
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <span class="display-5 fw-bold">
+                                    {{ property.average_rating|default:0|floatformat:1 }}
+                                </span>
+
+
+                                {% comment %}
+                                <span class="text-warning">
+                                    {% with ''|center:property.average_rating as range %}
+                                        {% for _ in range %}★{% endfor %}
+                                    {% endwith %}
+                                </span>
+                                {% endcomment %}
+
+                                <span class="text-warning">
+                                {% with ''|center:average_rating|floatformat:0 as range %}
+                                    {% for _ in range %}★{% endfor %}
+                                {% endwith %}
+                                </span>
+                                
+
+
+
+                                <span class="text-muted">({{ property.reviews.count }} reviews)</span>
+                            </div>
+
+                            {% if user.is_authenticated and not user_has_reviewed %}
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                                <i class="bi bi-pencil-square me-1"></i> Add Review
+                            </button>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="reviews-container">
+                            {% for review in reviews %}
+
+                            
+                                
+                                <div class="border-bottom pb-3 mb-3">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <h5 class="mb-0">{{ review.user.username }}</h5>
+                                        <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+                                    </div>
+                                    <div class="mb-2">
+                                        <span class="text-warning">
+                                            {% for i in "12345" %}
+                                                {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
+                                            {% endfor %}
+                                        </span>
+                                    </div>
+                                    <p class="mb-0">{{ review.comment }}</p>
+                                </div>
+                               
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-chat-square-text display-4 text-muted mb-3"></i>
+                            <p class="lead">No reviews yet</p>
+                            {% if user.is_authenticated and not user_has_reviewed %}
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                                <i class="bi bi-pencil-square me-1"></i> Be the first to review
+                            </button>
+                            {% elif not user.is_authenticated %}
+                            <p><a href="{% url 'login_user' %}?next={{ request.path }}" class="btn btn-outline-primary">Log in to leave a review</a></p>
+                            {% endif %}
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
-    </div>
 
-    <h3 class="mt-4">Amenities</h3>
-    <ul class="list-group mb-4">
-        <li class="list-group-item">Wi-Fi: {{ property.wi_fi|yesno:"Available,Not Available" }}</li>
-        <li class="list-group-item">Pool: {{ property.pool|yesno:"Available,Not Available" }}</li>
-        <li class="list-group-item">Kitchen: {{ property.kitchen|yesno:"Available,Not Available" }}</li>
-    </ul>
+        <!-- Sidebar -->
+        <div class="col-lg-4">
 
-    <h3 class="mt-4">Description</h3>
-    <div class="card mb-4">
-        <div class="card-body">
-            <p>{{ property.description }}</p>
-        </div>
-    </div>
+            
+            <!-- Property Info Card -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Property Details</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span class="text-muted">Property ID</span>
+                            <span>#{{ property.id }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span class="text-muted">Posted On</span>
+                            <span>{{ property.created_at|date:"M d, Y" }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span class="text-muted">Last Updated</span>
+                            <span>{{ property.updated_at|date:"M d, Y" }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span class="text-muted">Property Type</span>
+                            <span>{{ property.get_property_type_display }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span class="text-muted">Status</span>
+                            <span class="badge 
+                                {% if property.status == 'AVAILABLE' %}bg-success
+                                {% elif property.status == 'BOOKED' %}bg-warning
+                                {% elif property.status == 'RENTED' %}bg-secondary
+                                {% else %}bg-danger{% endif %}">
+                                {{ property.get_status_display }}
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Contact Card -->
+            <div class="card mb-4 shadow-sm " style="top: 20px;">
+                <div class="card-body">
+                    <h3 class="card-title mb-4">Contact</h3>
+                    
+                    <!-- Posted by info -->
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="flex-shrink-0">
+                            {% if property.posted_by.role == 'AGENCY' and property.posted_by.agency_profile.agency_logo %}
+                                <img src="{{ property.posted_by.agency_profile.agency_logo.url }}" 
+                                     class="rounded-circle" 
+                                     alt="{{ property.posted_by.agency_profile.agency_name }}"
+                                     width="60" height="60">
+                            {% elif property.posted_by.role == 'OWNER' and property.posted_by.owner_profile.owner_photo %}
+                                <img src="{{ property.posted_by.owner_profile.owner_photo.url }}" 
+                                     class="rounded-circle" 
+                                     alt="{{ property.posted_by.owner_profile.owner_name }}"
+                                     width="60" height="60">
+                            {% else %}
+                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center" 
+                                     style="width: 60px; height: 60px;">
+                                    <i class="bi bi-person fs-4 text-muted"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="mb-0">
+                                {% if property.posted_by.role == 'AGENCY' %}
+                                    {{ property.posted_by.agency_profile.agency_name }}
+                                {% elif property.posted_by.role == 'OWNER' %}
+                                    {{ property.posted_by.owner_profile.owner_name }}
+                                {% else %}
+                                    {{ property.posted_by.username }}
+                                {% endif %}
+                            </h5>
+                            <p class="text-muted mb-0">
+                                {% if property.posted_by.role == 'AGENCY' %}
+                                    Real Estate Agency
+                                {% elif property.posted_by.role == 'OWNER' %}
+                                    Property Owner
+                                {% else %}
+                                    {% if property.posted_by.role == 'ADMIN' %}Administrator{% else %}Customer{% endif %}
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Contact Form -->
+                    <form method="post" action="{% url 'send_inquiry' property.id %}">
+                        {% csrf_token %}
+                        
+                        {% comment %}
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Your Name</label>
+                            <input type="text" class="form-control" id="name" required>
+                        </div>
 
-    <h3 class="mt-4">Reviews</h3>
-    <div class="card mb-4">
-        <div class="card-body">
-            <p><strong>Rating:</strong> {{ property.review_star }} Stars</p>
-            <p><strong>Comment:</strong> {{ property.review_comment }}</p>
-        </div>
-    </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
 
-    <div class="text-center  mx-auto my-5 ">
-        <a href="{% url 'property' %}" class="btn btn-primary">Back to Properties</a>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone">
+                        </div>
+
+                         {% endcomment %}   
+
+                        <div class="mb-3">
+                       
+                            <label for="message" class="form-label">Message</label>
+                            <textarea class="form-control" name="inquiryMessage" id="message" rows="4" required>I'm interested in {{ property.name }} at {{ property.address }}</textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-send me-1"></i> Send Inquiry
+                        </button>
+                        
+
+                        
+                        {% comment %}
+                        <a href="{% url 'send_inquiry' property.id %}" class="btn btn-primary form-control"><i class="bi bi-send me-1"></i> Send Inquiry</a>
+                        {% endcomment %}
+                    </form>
+
+
+                            {% comment %}
+                            <div class="container mt-5">
+                            <h3>Approve Inquiry</h3>
+                            
+                            <p><strong>Message:</strong> {{ inquiry.message }}</p>
+                            <p>Approve this inquiry and reserve the property?</p>
+                            <form method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success">Approve & Reserve Property</button>
+                            <a href="" class="btn btn-secondary">Cancel</a>
+
+                            {% endcomment %}
+
+
+
+    </form>
+</div>
+                </div>
+            </div>
         
+
+
+        </div>
     </div>
 </div>
 
-{% endblock content %}
+<!-- Review Modal -->
+<div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reviewModalLabel">Add Your Review</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="rating" class="form-label">Rating</label>
+                        <div class="rating-input">
+                            {% for i in "54321" %}
+                                <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" {% if forloop.first %}checked{% endif %}>
+                                <label for="star{{ i }}">★</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="comment" class="form-label">Your Review</label>
+                        <textarea class="form-control" id="comment" name="comment" rows="4" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
+
+<!-- Footer -->
+{% include 'base/footer.html' %}
+
+{% endblock content %}

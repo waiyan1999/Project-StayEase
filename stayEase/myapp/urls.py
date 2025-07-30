@@ -1,35 +1,55 @@
 from django.urls import path
 from myapp import views
 
-
 urlpatterns = [
-    path('base/',views.base,name='base'),
-    path('',views.index,name='index'),
+    path('',views.index, name='index'),
+    path('property/',views.PropertyView.as_view(), name='property'),
+    path('property-detail/<int:pk>/',views.PropertyDetailView.as_view(),name='property_detail'),
     
-    #Propety Show 
-    path('property/',views.PropertyView.as_view(),name='property'),
+    path('agency/',views.AgencyView.as_view(),name='agency'),
+    path('agency-detail/<int:pk>/',views.AgencyDetailView.as_view(),name='agency_detail'),
     
-    #Property Detail Show
-    path('property-detail/<int:pk>/', views.propertyDetail,name='property_detail'),
+    path('owner/',views.OwnerView.as_view(),name='owner'),
+    path('onwer-detail/<int:pk>/',views.OwnerDetailview.as_view(),name='owner_detail'),
     
-    #Property Create Form
-    path('property-create/', views.propetyCreate, name='property_create'),
+    path('location/',views.LocationView.as_view(),name='location'),
     
-    #Region
-    path('region/',views.region,name='region'),
+    #path('service/',views.ServiceView.as_view(),name='service'),
     
-    #Delete Region
-    path('delete-region/<int:pk>/',views.delete_region,name='delete_region'),
+    path('login-user/',views.login_user, name='login_user'),
     
-    #Delete City
-    path('delete-city/<int:pk>/',views.delete_city,name='delete_city'),
+    path('logout-user/',views.logout_user,name='logout_user'),
     
-    #Login User
-    path('login-user/',views.login_user,name='login_user'),
+    path('register-user/', views.register_user,name='register_user'),
     
-    #logout User
-    path('logou-usr/',views.logout_user,name='logout_user'),
+    path('porfile/',views.ProfileView.as_view(),name='profile'),
     
-    #register user
-    path('register-user/',views.register_user,name='register_user'),
-]
+    path('admin-dashboard/',views.admin_dashboard,name='admin_dashobard'),
+
+    path('save-property/<int:pk>/',views.SavePropertyView.as_view(),name='save_property'),
+    
+    path('send-inquiry/<int:pk>/',views.sendInquiry,name='send_inquiry'),
+    
+    path('cancel-inquiry/<int:pk>/',views.cancelInquiry,name='cancel_inquiry'),
+    
+    path('inquiry-detail/<int:pk>/',views.inquiryDetail,name='inquiry_detail'),
+    
+    path('approve-inquiry/<int:pk>/',views.approveInquiry,name='approve_inquiry'),
+    
+    path('reject-inquiry/<int:pk>/',views.rejectInquiry,name='reject_inquiry'),
+    
+    path('agency-dashboard/',views.agencyDashboard,name='agency_dashboard'),
+    
+    path('service/',views.service,name='service'),
+    
+    path('about/',views.about,name='about'),
+    
+    path('contact/',views.contact,name='contact'),
+    
+    path('agency-setting/',views.agencySetting,name='agency_setting'),
+    
+    path('payment/<int:pk>/', views.payment, name='payment'),
+
+    
+    
+]   

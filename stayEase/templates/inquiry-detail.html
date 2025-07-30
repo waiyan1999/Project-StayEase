@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="mb-4">Inquiry Details</h2>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <h5 class="card-title">From: {{ inquiry.customer.username }}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">To Agency: {{ inquiry.agency_owner.username }}</h6>
+
+            <p><strong>Property:</strong> {{ inquiry.property.name }}</p>
+            <p><strong>Property Status:</strong> {{ inquiry.property.status }}</p>
+
+            <hr>
+            <p><strong>Message:</strong> {{ inquiry.message }}</p>
+            <p><strong>Created At:</strong> {{ inquiry.created_at|date:"M d, Y - H:i" }}</p>
+            <p><strong>Last Edited:</strong> {{ inquiry.edited_at|date:"M d, Y - H:i" }}</p>
+            <p><strong>Is Replied:</strong> 
+                {% if inquiry.is_replied %}
+                    <span class="badge bg-success">Yes</span>
+                {% else %}
+                    <span class="badge bg-secondary">No</span>
+                {% endif %}
+            </p>
+            <p><strong>Is Approved:</strong> 
+                {% if inquiry.is_approved %}
+                    <span class="badge bg-success">Approved</span>
+                {% else %}
+                    <span class="badge bg-warning">Pending</span>
+                {% endif %}
+            </p>
+
+            {% if request.user == inquiry.agency_owner and not inquiry.is_approved %}
+                <form method="post" action="{% url 'approve_inquiry' inquiry.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary mt-3">Approve & Reserve Property</button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a href="{% url 'profile' %}" class="btn btn-outline-secondary">Back to Inquiry List</a>
+    </div>
+</div>
+{% endblock content %}

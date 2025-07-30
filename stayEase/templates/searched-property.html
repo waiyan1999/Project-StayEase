@@ -1,0 +1,181 @@
+ <!-- Featured Properties -->
+
+{% if search_properties %}
+<!-- Searched Properties -->
+<div class="">
+    
+    <!--Available Property Listing Section -->
+    <section class="py-1 bg-white">
+        <div class="px-4">  
+            <div class=" mb-3">
+                <h2 class="fw-bold"> Searched Properties </h2>
+                <p class="text-muted"> Searched Result  </p>
+            </div>
+            <div class="row g-4">
+                {% for property in search_properties %}
+                <!-- Property Card -->
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        {% if property.primary_image %}
+                        <img src="{{ property.primary_image.url }}" class="card-img-top" alt="{{ property.name }}">
+                        {% else %}
+                        <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <span class="text-white">No Image Available</span>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="card-body">
+                            <div class="text-warning mb-2">
+                                {% with ''|center:5 as range %}
+                                {% for _ in range %}
+                                    {% if forloop.counter <= property.average_rating %}
+                                        <i class="fas fa-star"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                                {% endwith %}
+                                <span class="text-muted">({{ property.review_count }})</span>
+                            </div>
+                            <h5 class="card-title">{{ property.name }}</h5>
+
+                            {% if property.status == 'AVAILABLE' %}
+
+                                <span class="badge bg-success" >Available</span>
+
+                            {% elif property.status == 'BOOKED' %}
+
+                                <span class="badge bg-warning" >Booked</span>
+
+                            {% elif property.status == 'RENTED' %}
+
+                                <span class="badge bg-secondary" > Rented </span>
+
+                            {% elif property.status == 'MAINTENANCE' %}
+
+                                <span class="badge bg-danger" > Under Maintenance </span>
+
+                            {% endif %}
+
+                            <p class="text-muted">
+                                <i class="fas fa-map-marker-alt"></i> {{ property.city.name }}, {{ property.region.name }}
+                            </p>
+                            <div class="d-flex flex-wrap gap-2 my-3">
+                                {% if property.beds %}
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-bed text-primary"></i> {{ property.beds }} beds
+                                </span>
+                                {% endif %}
+
+                                {% if property.baths %}
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-bath text-primary"></i> {{ property.baths }} baths
+                                </span>
+                                {% endif %}
+
+                                {% if property.has_wifi %}
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-wifi text-primary"></i> WiFi
+                                </span>
+                                {% endif %}
+
+                                {% if property.has_pool %}
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-swimming-pool text-primary"></i> Pool
+                                </span>
+                                {% endif %}
+
+                                {% if property.has_kitchen %}
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-utensils text-primary"></i> Kitchen
+                                </span>
+                                {% endif %}
+
+                                {% if property.area_sqft %}
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-ruler-combined text-primary"></i> {{ property.area_sqft }} sqft
+                                </span>
+                                {% endif %}
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <div>
+                                    <span class="fs-5 fw-bold">{{ property.rent_amount }} MMK</span>
+                                    <span class="text-muted">/ {{ property.rent_type }}</span>
+                                </div>             
+{% if user.is_authenticated %}   
+
+    {% if property.id in saved_porperties %}
+
+        
+            {% if sproperty.property.id == property.id %}
+
+            <button class="btn btn-danger" > Saved</button>
+
+            {% else %}
+
+            <button class="btn btn-outline-danger"  onclick="saveProperty(event, {{ property.id }}, {{ user.id }})"> Save </button>
+
+            {% endif %}
+
+    {% endif %}
+
+{% endif %}
+                            
+    {% if property.id in save_property_list %}
+        <!-- Property is saved -->
+
+        {% for saved in saved_porperties %}
+
+        
+
+        {% if saved.user.id == user.id %}
+
+            {% if saved.property.id == property.id %}
+                
+                <a href="" class="btn btn-warning" onclick="unSaveProperty(event,{{ saved.id }})" data-property-id="{{ property.id }}"> Unsave </a>
+            {% endif %}
+
+        {% endif %}
+        
+        
+
+        {% endfor %}
+
+
+    {% else %}
+        <!-- Property is NOT saved -->
+            {{ save_property_list.id }}
+    
+        <a href="" onclick="saveProperty(event , {{ property.id }} , {{ user.id }} )" class="btn btn-outline-warning" data-property-id="{{ property.id }}"> Save </a>
+
+
+    {% endif %}
+
+
+</div>
+        
+                    <a href="{% url 'property_detail' property.id %}" class="btn btn-primary w-100 mt-3">
+                        View Details
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <h4 class="text-muted">No properties available</h4>
+            <p>Check back later or add a new property</p>
+        </div>
+        {% endfor %}
+    </div>
+    
+   
+
+</div>
+</section>
+</div>
+{% endif %}
+            
+            
+          
+        
+    

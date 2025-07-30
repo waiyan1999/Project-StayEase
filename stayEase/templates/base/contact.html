@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<!-- Navigation -->
+{% include 'base/nav-bar.html' %}
+
+<!-- Contact Section -->
+    <section id="contact" class="py-5 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <h2 class="fw-bold mb-4">Contact Us</h2>
+                    <p>Have questions or need assistance? Our team is here to help.</p>
+                    
+                    <div class="mb-4">
+                        <h5><i class="bi bi-geo-alt-fill text-primary me-2"></i> Corporate Office</h5>
+                        <p class="ms-4">123 Real Estate Drive, Suite 400<br>New York, NY 10001</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5><i class="bi bi-telephone-fill text-primary me-2"></i> Contact Numbers</h5>
+                        <p class="ms-4">
+                            General Inquiries: (555) 123-4567<br>
+                            Tenant Support: (555) 123-4568<br>
+                            Owner Services: (555) 123-4569
+                        </p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5><i class="bi bi-envelope-fill text-primary me-2"></i> Email</h5>
+                        <p class="ms-4">
+                            General: info@primestay.com<br>
+                            Support: support@primestay.com
+                        </p>
+                    </div>
+                    
+                    <h5 class="mb-3">Follow Us</h5>
+                    <div class="social-icons">
+                        <a href="#" class="social-icon"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="social-icon"><i class="bi bi-twitter"></i></a>
+                        <a href="#" class="social-icon"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="social-icon"><i class="bi bi-linkedin"></i></a>
+                        <a href="#" class="social-icon"><i class="bi bi-youtube"></i></a>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6">
+                    <div class="card shadow-sm">
+                        <div class="card-body p-4">
+                            <h4 class="mb-4">Send Us a Message</h4>
+                            <form>
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Your Name</label>
+                                    <input type="text" class="form-control" id="name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" id="email" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="phone" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="phone">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="subject" class="form-label">Subject</label>
+                                    <select class="form-select" id="subject">
+                                        <option selected>General Inquiry</option>
+                                        <option>Property Listing</option>
+                                        <option>Tenant Support</option>
+                                        <option>Management Services</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="message" class="form-label">Message</label>
+                                    <textarea class="form-control" id="message" rows="4" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">Send Message</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+<!-- Footer -->
+{% include 'base/footer.html' %}
+
+{% endblock content %}

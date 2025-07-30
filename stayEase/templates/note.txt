@@ -1,0 +1,444 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} {{ agency.agency_name }} - Agency Profile {% endblock title %}
+
+{% block content %}
+
+<div class="container py-5">
+    <!-- Agency Header -->
+    <div class="row mb-5">
+        <div class="col-md-4 text-center">
+            <!-- Agency Logo -->
+            {% if agency.agency_logo %}
+            <img src="{{ agency.agency_logo.url }}" 
+                 class="img-fluid rounded-circle border border-4 border-primary shadow" 
+                 alt="{{ agency.agency_name }} Logo"
+                 style="width: 220px; height: 220px; object-fit: cover;">
+            {% else %}
+            <div class="rounded-circle border border-4 border-primary d-flex align-items-center justify-content-center mx-auto shadow" 
+                 style="width: 220px; height: 220px; background-color: #e9ecef;">
+                <span class="text-muted display-4">{{ agency.agency_name|slice:":1" }}</span>
+            </div>
+            {% endif %}
+            
+            <!-- Rating -->
+            <div class="mt-4">
+                <div class="d-flex justify-content-center align-items-center mb-2">
+                    <div class="text-warning me-2">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= agency.rating %}
+                                <i class="fas fa-star fa-lg"></i>
+                            {% else %}
+                                <i class="far fa-star fa-lg"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <span class="text-muted">({{ agency.review_count }} reviews)</span>
+                </div>
+                <span class="badge bg-primary rounded-pill px-3 py-2">
+                    {{ agency.property_count }} Properties Listed
+                </span>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card shadow-sm h-100 border-0">
+                <div class="card-body">
+                    <h1 class="display-5 fw-bold text-primary mb-3">{{ agency.agency_name }}</h1>
+                    
+                    <div class="d-flex flex-wrap gap-3 mb-4">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-user text-primary me-2 fa-lg"></i>
+                            <div>
+                                <p class="mb-0 text-muted">Contact Person</p>
+                                <p class="mb-0 fs-5">{{ agency.contact_person }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-certificate text-primary me-2 fa-lg"></i>
+                            <div>
+                                <p class="mb-0 text-muted">License Number</p>
+                                <p class="mb-0 fs-5">{{ agency.license_number|default:"Pending" }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-map-marker-alt text-primary me-2 fa-lg"></i>
+                            <div>
+                                <p class="mb-0 text-muted">Location</p>
+                                <p class="mb-0 fs-5">{{ agency.city }}, {{ agency.region }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex flex-wrap gap-3 mb-4">
+                        {% if agency.website %}
+                        <a href="{{ agency.website }}" target="_blank" class="btn btn-outline-primary">
+                            <i class="fas fa-globe me-2"></i> Visit Website
+                        </a>
+                        {% endif %}
+                        
+                        <a href="tel:{{ agency.user.phone }}" class="btn btn-outline-primary">
+                            <i class="fas fa-phone-alt me-2"></i> Call Now
+                        </a>
+                        
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#contactModal">
+                            <i class="fas fa-envelope me-2"></i> Send Message
+                        </button>
+                    </div>
+                    
+                    <!-- About Section -->
+                    <div class="mt-4">
+                        <h3 class="mb-3">About Our Agency</h3>
+                        <p class="lead">{{ agency.description|default:"We are a professional real estate agency dedicated to providing exceptional service to both property owners and tenants. With years of experience in the market, we specialize in connecting people with their perfect homes and investment opportunities." }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agency Properties -->
+    <div class="mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold">Our Properties</h2>
+            <a href="" class="btn btn-outline-primary">
+                View All Properties <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        </div>
+        
+        {% if agency_properties %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for property in agency_properties %}
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0">
+                    <!-- Property Image -->
+                    <div class="position-relative">
+                        <img src="{{ property.primary_image.url }}" 
+                             class="card-img-top" 
+                             alt="{{ property.name }}"
+                             style="height: 200px; object-fit: cover;">
+                        
+                        <!-- Property Status Badge -->
+                        <div class="position-absolute top-0 end-0 m-2">
+                            <span class="badge 
+                                {% if property.status == 'AVAILABLE' %}bg-success
+                                {% elif property.status == 'BOOKED' %}bg-warning
+                                {% elif property.status == 'RENTED' %}bg-secondary
+                                {% else %}bg-danger{% endif %}">
+                                {{ property.get_status_display }}
+                            </span>
+                        </div>
+                        
+                        <!-- Price Tag -->
+                        <div class="position-absolute bottom-0 start-0 m-2">
+                            <span class="badge bg-primary px-3 py-2 fs-6">
+                                ${{ property.rent_amount }}<small class="fs-7">/{{ property.get_rent_type_display }}</small>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Property Details -->
+                    <div class="card-body">
+                        <h5 class="card-title mb-1">{{ property.name }}</h5>
+                        <p class="card-text text-muted mb-2">
+                            <i class="fas fa-map-marker-alt text-primary me-1"></i> 
+                            {{ property.city.name }}, {{ property.region.name }}
+                        </p>
+                        
+                        <div class="d-flex justify-content-between mb-3">
+                            <div>
+                                <span class="badge bg-light text-dark me-2">
+                                    <i class="fas fa-bed text-primary me-1"></i> {{ property.beds }} Beds
+                                </span>
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-bath text-primary me-1"></i> {{ property.baths }} Baths
+                                </span>
+                            </div>
+                            
+                            <div class="text-warning">
+                                {% with ''|center:property.average_rating as range %}
+                                    {% for _ in range %}★{% endfor %}
+                                {% endwith %}
+                                <span class="text-muted ms-1">({{ property.reviews.count }})</span>
+                            </div>
+                        </div>
+                        
+                        <p class="card-text text-truncate">{{ property.description }}</p>
+                    </div>
+                    
+                    <!-- Property Footer -->
+                    <div class="card-footer bg-white d-flex justify-content-between border-0">
+                        <a href="{% url 'property_detail' property.id %}" class="btn btn-sm btn-outline-primary">
+                            View Details
+                        </a>
+                        <div>
+                            <span class="badge bg-light text-dark">
+                                {{ property.get_property_type_display }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-building fa-4x text-muted mb-4"></i>
+                <h3 class="mb-3">No Properties Listed Yet</h3>
+                <p class="text-muted">This agency hasn't listed any properties yet.</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Reviews Section -->
+    <div class="mb-5">
+        <h2 class="fw-bold mb-4">Customer Reviews</h2>
+        
+        {% if agency_reviews %}
+        <div class="row">
+            <!-- Overall Rating -->
+            <div class="col-lg-4 mb-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body text-center py-5">
+                        <div class="display-3 fw-bold text-primary mb-0">
+                            {{ agency.rating|floatformat:1 }}
+                        </div>
+                        <div class="text-warning mb-3">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= agency.rating|floatformat:0|add:"0" %}
+                                    <i class="fas fa-star fa-2x"></i>
+                                {% else %}
+                                    <i class="far fa-star fa-2x"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <p class="text-muted mb-0">Based on {{ agency.review_count }} reviews</p>
+                        
+                        <div class="mt-4">
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                                <i class="fas fa-pencil-alt me-2"></i> Write a Review
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reviews List -->
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        {% for review in agency_reviews %}
+                        <div class="border-bottom pb-4 mb-4">
+                            <div class="d-flex justify-content-between mb-2">
+                                <h5 class="mb-0">{{ review.user.username }}</h5>
+                                <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+                            </div>
+                            <div class="mb-3">
+                                <span class="text-warning">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
+                                    {% endfor %}
+                                </span>
+                            </div>
+                            <p class="mb-0">{{ review.comment }}</p>
+                        </div>
+                        {% endfor %}
+                        
+                        <!-- Pagination for Reviews -->
+                        <nav aria-label="Reviews pagination">
+                            <ul class="pagination justify-content-center mt-4">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-comments fa-4x text-muted mb-4"></i>
+                <h3 class="mb-3">No Reviews Yet</h3>
+                <p class="text-muted mb-4">Be the first to review this agency.</p>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#reviewModal">
+                    <i class="fas fa-pencil-alt me-2"></i> Write the First Review
+                </button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Location Section -->
+    <div class="mb-5">
+        <h2 class="fw-bold mb-4">Our Location</h2>
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-5">
+                        <h4 class="mb-3">Office Address</h4>
+                        <p class="mb-4">
+                            <i class="fas fa-map-marker-alt text-primary me-2"></i> 
+                            {{ agency.address|default:"123 Real Estate Avenue, Downtown" }}
+                        </p>
+                        
+                        <h4 class="mb-3">Contact Information</h4>
+                        <p class="mb-2">
+                            <i class="fas fa-phone-alt text-primary me-2"></i> 
+                            {{ agency.user.phone|default:"+1 (555) 123-4567" }}
+                        </p>
+                        {% if agency.website %}
+                        <p class="mb-0">
+                            <i class="fas fa-globe text-primary me-2"></i> 
+                            <a href="{{ agency.website }}" target="_blank">{{ agency.website }}</a>
+                        </p>
+                        {% endif %}
+                        
+                        <div class="mt-4">
+                            <h4 class="mb-3">Business Hours</h4>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">Monday - Friday: 9:00 AM - 6:00 PM</li>
+                                <li class="mb-2">Saturday: 10:00 AM - 4:00 PM</li>
+                                <li>Sunday: Closed</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="ratio ratio-16x9">
+                            <iframe 
+                                src="https://maps.google.com/maps?q={{ agency.city }},{{ agency.region }}&hl=es;z=14&amp;output=embed" 
+                                style="border:0; border-radius: 8px;" 
+                                allowfullscreen>
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Contact Modal -->
+<div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="contactModalLabel">Contact {{ agency.agency_name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="contactName" class="form-label">Your Name</label>
+                        <input type="text" class="form-control" id="contactName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="contactEmail" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="contactEmail" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="contactPhone" class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" id="contactPhone">
+                    </div>
+                    <div class="mb-3">
+                        <label for="contactMessage" class="form-label">Message</label>
+                        <textarea class="form-control" id="contactMessage" rows="4" required>I'm interested in properties from {{ agency.agency_name }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-paper-plane me-2"></i> Send Message
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Review Modal -->
+<div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reviewModalLabel">Write a Review</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-4 text-center">
+                        <p class="mb-2">How would you rate this agency?</p>
+                        <div class="rating-input d-flex justify-content-center">
+                            {% for i in "54321" %}
+                                <input type="radio" id="agency-star{{ i }}" name="agency-rating" value="{{ i }}">
+                                <label for="agency-star{{ i }}">★</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reviewTitle" class="form-label">Review Title</label>
+                        <input type="text" class="form-control" id="reviewTitle" placeholder="Summarize your experience">
+                    </div>
+                    <div class="mb-3">
+                        <label for="reviewComment" class="form-label">Your Review</label>
+                        <textarea class="form-control" id="reviewComment" rows="4" placeholder="Share details of your experience with this agency" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-paper-plane me-2"></i> Submit Review
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.2s;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    .rating-input {
+        display: flex;
+        justify-content: center;
+    }
+    .rating-input input {
+        display: none;
+    }
+    .rating-input label {
+        font-size: 2rem;
+        color: #ddd;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+    .rating-input input:checked ~ label,
+    .rating-input label:hover,
+    .rating-input label:hover ~ label {
+        color: #ffc107;
+    }
+    .rating-input input:checked + label {
+        color: #ffc107;
+    }
+    .property-card-img {
+        height: 200px;
+        object-fit: cover;
+    }
+    .property-badge {
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock content %}

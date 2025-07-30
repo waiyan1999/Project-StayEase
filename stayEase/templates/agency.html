@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Real Estate Agencies {% endblock title %}
+
+{% block content %}
+
+<div class="container py-5">
+    <!-- Header Section -->
+    <div class="text-center mb-5">
+        <h1 class="fw-bold display-4 text-primary">Real Estate Agencies</h1>
+        <p class="lead text-muted">Find professional agencies to help with your property needs</p>
+    </div>
+
+    <!-- Agency Search and Filter -->
+    <div class="card shadow-sm mb-5">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <div class="input-group">
+                        <span class="input-group-text bg-primary text-white">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control form-control-lg" placeholder="Search agencies by name, location or specialty">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <select class="form-select form-select-lg">
+                        <option selected>All Locations</option>
+                        <option>Yangon</option>
+                        <option>Mandalay</option>
+                        <option>Naypyidaw</option>
+                        <option>Taunggyi</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agency Listing Section -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        {% for agency in agencies %}
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0">
+                <!-- Agency Logo -->
+                <div class="text-center pt-4">
+                    {% if agency.agency_logo %}
+                    <img src="{{ agency.agency_logo.url }}" 
+                         class="img-fluid rounded-circle border border-4 border-primary" 
+                         alt="{{ agency.agency_name }} Logo"
+                         style="width: 120px; height: 120px; object-fit: cover;">
+                    {% else %}
+                    <div class="rounded-circle border border-4 border-primary d-flex align-items-center justify-content-center mx-auto" 
+                         style="width: 120px; height: 120px; background-color: #e9ecef;">
+                        <span class="text-muted fs-4">{{ agency.agency_name|slice:":1" }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Agency Info -->
+                <div class="card-body text-center">
+                    <h3 class="card-title mb-2">{{ agency.agency_name }}</h3>
+                    
+                    <div class="d-flex justify-content-center mb-3">
+                        <div class="text-warning">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= agency.rating %}
+                                    <i class="fas fa-star"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                            <span class="text-muted ms-2">({{ agency.review_count }})</span>
+                        </div>
+                    </div>
+                    
+                    <p class="card-text mb-1">
+                        <i class="fas fa-user text-primary me-2"></i>
+                        Contact: {{ agency.contact_person }}
+                    </p>
+                    <p class="card-text mb-1">
+                        <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                        {{ agency.city }}, {{ agency.region }}
+                    </p>
+                    <p class="card-text mb-3">
+                        <i class="fas fa-certificate text-primary me-2"></i>
+                        License Number : {{ agency.license_number }}
+                    </p>
+                    <p class="card-text mb-3">
+                        <i class="fas fa-certificate text-primary me-2"></i>
+                        License Status: {{ agency.license_status }}
+                    </p>
+                    
+                    {% if agency.website %}
+                    <p class="card-text">
+                        <a href="{{ agency.website }}" target="_blank" class="text-decoration-none">
+                            <i class="fas fa-globe text-primary me-2"></i>Website
+                        </a>
+                    </p>
+                    {% endif %}
+                    
+                    <div class="mt-4">
+                      
+                        <a href="{% url 'agency_detail' agency.id %}" class="btn btn-primary px-4">
+                            <i class="fas fa-eye me-2"></i>View Details
+                        </a>
+                        
+
+                    </div>
+                </div>
+                
+                <!-- Property Count -->
+                <div class="card-footer bg-transparent border-0 text-center">
+                    <div class="d-flex justify-content-center">
+                        <span class="badge bg-primary rounded-pill px-3 py-2">
+                            {{ agency.property_count }} Properties Listed
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <div class="py-5">
+                <i class="fas fa-building fa-4x text-muted mb-4"></i>
+                <h3 class="mb-3">No Agencies Found</h3>
+                <p class="text-muted">We couldn't find any real estate agencies matching your criteria.</p>
+                <button class="btn btn-outline-primary mt-3">
+                    Clear Filters
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    <nav class="mt-5" aria-label="Agency pagination">
+        <ul class="pagination justify-content-center">
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+                <a class="page-link" href="#">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+{% endblock content %}
