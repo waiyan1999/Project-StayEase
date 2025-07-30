@@ -110,7 +110,7 @@ def index(request):
         return redirect('agency_dashboard')
     
     elif hasattr(request.user, 'role') and request.user.role == 'ADMIN':
-        return redirect('agency_dashboard')
+        return redirect('admin_dashboard')
     
     # Default case (admin or unknown)
     return redirect('login_user')  # Fixed typo in URL name
@@ -700,7 +700,7 @@ from .form import PropertyForm
 def agencyDashboard(request):
     # Verify user role
     if request.user.role != 'AGENCY':
-        return redirect('home')
+        return redirect('index')
     
     # Handle all POST requests (create, update, delete)
     if request.method == 'POST':
