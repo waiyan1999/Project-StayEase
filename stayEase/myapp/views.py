@@ -48,54 +48,74 @@ def base(request):
 
 def index(request):
     # Check user type using a more reliable approach
-    if request.user.role == 'CUSTOMER':
-      
-        messages.info(request, f'Welcome {request.user.username}')
+    if request.user.is_authenticated:
+        if request.user.role == 'CUSTOMER':
         
-        # Common context for both GET and POST
-        regions = Region.objects.all()
-        cities = City.objects.all()
-        
-        if request.method == 'POST':
-            # Get filter parameters with default None values
-            region_id = request.POST.get('region')
-            township_id = request.POST.get('township')
-            property_type_value = request.POST.get('property_type')
-
-            # Start with all properties
-            search_properties = Property.objects.all()
-            region_obj = None
-            township_obj = None
-
-            # Apply filters sequentially
-            if region_id:
-                region_obj = Region.objects.filter(id=region_id).first()
-                if region_obj:
-                    search_properties = search_properties.filter(region=region_obj)
-
-            if township_id:
-                township_obj = City.objects.filter(id=township_id).first()
-                if township_obj:
-                    search_properties = search_properties.filter(city=township_obj)
-
-            if property_type_value:
-                search_properties = search_properties.filter(property_type=property_type_value)
+            messages.info(request, f'Welcome {request.user.username}')
             
+            # Common context for both GET and POST
+            regions = Region.objects.all()
+            cities = City.objects.all()
+            
+            if request.method == 'POST':
+                # Get filter parameters with default None values
+                region_id = request.POST.get('region')
+                township_id = request.POST.get('township')
+                property_type_value = request.POST.get('property_type')
+
+                # Start with all properties
+                search_properties = Property.objects.all()
+                region_obj = None
+                township_obj = None
+
+                # Apply filters sequentially
+                if region_id:
+                    region_obj = Region.objects.filter(id=region_id).first()
+                    if region_obj:
+                        search_properties = search_properties.filter(region=region_obj)
+
+                if township_id:
+                    township_obj = City.objects.filter(id=township_id).first()
+                    if township_obj:
+                        search_properties = search_properties.filter(city=township_obj)
+
+                if property_type_value:
+                    search_properties = search_properties.filter(property_type=property_type_value)
+                
+                saved_porperties = SaveProperty.objects.filter(user = request.user)
+                save_property = SaveProperty.objects.filter(user=request.user.id)
+                save_property_list = SaveProperty.objects.filter(user=request.user).values_list('property_id', flat=True)
+                featured_properties = Property.objects.filter(is_featured=True,admin_approved ='APPROVED' )
+                yangon_properties = Property.objects.filter(region = 1)
+                mandalay_properties = Property.objects.filter(region = 2)    
+
+                context = {
+                    'search_properties': search_properties,
+                    'region': region_obj,
+                    'township': township_obj,
+                    'property_type': property_type_value,
+                    'regions': regions,  # Maintain form options
+                    'cities': cities,    # Maintain form options,
+                    
+                    'featured_properties': featured_properties,
+                    'regions': regions,
+                    'cities': cities,
+                    'saved_porperties':saved_porperties,
+                    'save_property':save_property,
+                    'save_property_list':save_property_list,
+                    'yangon_properties':yangon_properties,
+                    'mandalay_properties':mandalay_properties
+                }
+                return render(request, 'index.html', context)
+            
+            # Handle GET request
             saved_porperties = SaveProperty.objects.filter(user = request.user)
             save_property = SaveProperty.objects.filter(user=request.user.id)
             save_property_list = SaveProperty.objects.filter(user=request.user).values_list('property_id', flat=True)
             featured_properties = Property.objects.filter(is_featured=True,admin_approved ='APPROVED' )
             yangon_properties = Property.objects.filter(region = 1)
-            mandalay_properties = Property.objects.filter(region = 2)    
-
+            mandalay_properties = Property.objects.filter(region = 2)
             context = {
-                'search_properties': search_properties,
-                'region': region_obj,
-                'township': township_obj,
-                'property_type': property_type_value,
-                'regions': regions,  # Maintain form options
-                'cities': cities,    # Maintain form options,
-                
                 'featured_properties': featured_properties,
                 'regions': regions,
                 'cities': cities,
@@ -104,41 +124,22 @@ def index(request):
                 'save_property_list':save_property_list,
                 'yangon_properties':yangon_properties,
                 'mandalay_properties':mandalay_properties
+                
+                
             }
             return render(request, 'index.html', context)
         
-        # Handle GET request
-        saved_porperties = SaveProperty.objects.filter(user = request.user)
-        save_property = SaveProperty.objects.filter(user=request.user.id)
-        save_property_list = SaveProperty.objects.filter(user=request.user).values_list('property_id', flat=True)
-        featured_properties = Property.objects.filter(is_featured=True,admin_approved ='APPROVED' )
-        yangon_properties = Property.objects.filter(region = 1)
-        mandalay_properties = Property.objects.filter(region = 2)
-        context = {
-            'featured_properties': featured_properties,
-            'regions': regions,
-            'cities': cities,
-            'saved_porperties':saved_porperties,
-            'save_property':save_property,
-            'save_property_list':save_property_list,
-            'yangon_properties':yangon_properties,
-            'mandalay_properties':mandalay_properties
-            
-            
-        }
-        return render(request, 'index.html', context)
-    
-    # Handle other user types
-    elif request.user.role == 'AGENCY':
-        return redirect('agency_dashboard')
-    
-    elif request.user.role == 'OWNER':
-        return redirect('agency_dashboard')
-    
-    elif request.user.role == 'ADMIN':
-        return redirect('admindashobard')
-    
-    
+        # Handle other user types
+        elif request.user.role == 'AGENCY':
+            return redirect('agency_dashboard')
+        
+        elif request.user.role == 'OWNER':
+            return redirect('agency_dashboard')
+        
+        elif request.user.role == 'ADMIN':
+            return redirect('admindashobard')
+        
+        
     return redirect('login_user')  
 
 
