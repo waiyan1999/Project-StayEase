@@ -377,7 +377,7 @@ def login_user(request):
                 return redirect('index')
             
             elif request.user.role == 'AGENCY':
-                return redirect('agencydashboard')
+                return redirect('agency_dashboard')
             
             else : 
                 return redirect('admindashobard')
