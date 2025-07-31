@@ -184,5 +184,16 @@ class Inquiry(models.Model):
         self.save()
         self.property.status = 'BOOKED'  # or your appropriate status
         self.property.save()
+        
+
+class ContactMessage(models.Model):
+    sender = models.ForeignKey(CustomUser,on_delete=models.SET_NULL,blank=True,null=True)
+    sender_email = models.EmailField(blank=True,null=True)
+    sender_phone = models.CharField(max_length=12,blank=True,null=True)
+    sender_subject = models.CharField(max_length=15,blank=True,null=True)
+    sender_message = models.TextField()
+    
+    def __str__(self):
+        return self.sender.username
     
     

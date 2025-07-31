@@ -4,8 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Property Management Admin Dashboard</title>
+     <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -413,8 +418,7 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="logo">
-            <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2ZmZiI+PHBhdGggZD0iTTEwLDEwVjRIOEM2LjksNCA2LDQuOSA2LDZ2MTRjMCwxLjEsMC45LDIsMiwyaDExYzEuMSwwLDItMC45LDItMnYtOEgxMHY0SDEweiBNMTgsMThIOFY2aDJ2NGg4VjhIMTJ2Mmg2VjE4eiIvPjwvc3ZnPg==" alt="Logo">
-            <h1>Property Admin</h1>
+            <h1> StayEase Admin</h1>
         </div>
         
         <div class="menu">
@@ -422,33 +426,43 @@
                 <i class="fas fa-home"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="#" class="menu-item">
+            <a href="#user" class="menu-item">
                 <i class="fas fa-users"></i>
                 <span>Users</span>
             </a>
-            <a href="#" class="menu-item">
+            <a href="#propertysection" class="menu-item">
                 <i class="fas fa-building"></i>
                 <span>Properties</span>
             </a>
-            <a href="#" class="menu-item">
+            <a href="#agency" class="menu-item">
                 <i class="fas fa-house-user"></i>
                 <span>Agencies</span>
             </a>
-            <a href="#" class="menu-item">
+            <a href="#recent" class="menu-item">
                 <i class="fas fa-user-tie"></i>
-                <span>Owners</span>
+                <span>Recent</span>
             </a>
-            <a href="#" class="menu-item">
+            <a href="#approval" class="menu-item">
+                <i class="fas fa-user-tie"></i>
+                <span>Approval</span>
+            </a>
+            <a href="#location" class="menu-item">
                 <i class="fas fa-map-marker-alt"></i>
                 <span>Locations</span>
             </a>
-            <a href="#" class="menu-item">
+            <a href="#review" class="menu-item">
                 <i class="fas fa-star"></i>
                 <span>Reviews</span>
             </a>
+            {% comment %}
             <a href="#" class="menu-item">
                 <i class="fas fa-cog"></i>
                 <span>Settings</span>
+            </a>
+            {% endcomment %}
+        <a href="{% url 'logout_user' %}" class="menu-item">
+                <i class="fas fa-user"></i>
+                <span> Logout </span>
             </a>
         </div>
     </div>
@@ -469,7 +483,7 @@
         <!-- Stats Grid -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="icon bg-primary">
+                <div class="icon bg-primary-subtle">
                     <i class="fas fa-users"></i>
                 </div>
                 <h3>{{ total_users }}</h3>
@@ -477,7 +491,7 @@
             </div>
 
             <div class="stat-card">
-                <div class="icon bg-warning">
+                <div class="icon bg-warning-subtle">
                     <i class="fas fa-house-user"></i>
                 </div>
                 <h3>{{ agencies_registered }}</h3>
@@ -485,8 +499,8 @@
             </div>
             
             <div class="stat-card">
-                <div class="icon bg-primary">
-                    <i class="fas fa-building"></i>
+                <div class="icon bg-primary-subtle">
+                    <i class="fas fa-building bg-light"></i>
                 </div>
                 <h3>{{ properties_listed }}</h3>
                 <p>Properties Listed</p>
@@ -494,9 +508,9 @@
 
             <div class="stat-card">
                 <div class="icon bg-success">
-                    <i class="fas fa-building"></i>
+                    <i class="fas fa-building bg-light"></i>
                 </div>
-                <h3>{{ properties_listed }}</h3>
+                <h3>{{ active_listed }}</h3>
                 <p> Active Properties </p>
             </div>
             
@@ -531,6 +545,7 @@
             </div>
         </div>
         
+        {% comment %}
         <!-- Quick Actions -->
         <div class="quick-actions">
             <div class="action-btn">
@@ -548,17 +563,18 @@
                 <h4>Add Agency</h4>
             </div>
             
-            <div class="action-btn">
+            <a class="action-btn" href="#location" >
                 <i class="fas fa-map-marked-alt"></i>
                 <h4>Add Location</h4>
-            </div>
+            </a>
         </div>
+        {% endcomment %}
 
 
        
 
-
-        <div class="recent-activities">
+<!-- Recent Activities -->
+<div class="recent-activities" id="recent">
     <h3>Recent Activities</h3>
 
     {% for log in recent_logs %}
@@ -600,8 +616,9 @@
     {% endfor %}
 </div>
 
-        
-        <div class="pending-approvals">
+<!-- Pending Approval -->
+<div class="pending-approvals" id="approval">
+    {% if pending_properties %}
             <h3>Pending Approvals</h3>
             
             {% for property in pending_properties %}
@@ -616,15 +633,429 @@
                     <p> {{ property.name }}  posted by  {{ property.posted_by }} </p>
                 </div>
                 <div class="approval-actions">
-                    <button class="btn btn-success" onclick="propertyAdminApprove(event,{{ property.id }})" >Approve</button>
-                    <button class="btn btn-danger">Reject</button>
+                    <button class="btn btn-success" onclick="approveProperty(event,{{property.id}})" >Approve</button>
+                    <button class="btn btn-danger" onclick="rejectProperty(event,{{property.id}})" >Reject</button>
                 </div>
             </div>
 
             {% endfor %}
+    {% else %}  
+    
+    <h4>There is no Pending Approvals.</h4>
+    
+    {% endif %}
 
 
-           <script>
+</div>
+<br>
+
+<!-- Users -->
+<section id="user" class="pending-approvals">
+<tabel-title><h3> User </h3></tabel-title>
+<table class="table table-hover" >
+
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Inquiry</th>
+            <th>Saved List</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% if customer_user %}
+            {% for user in customer_user %}
+                <tr>
+                    <td> {{ user.id }} </td>
+                    <td> {{ user.username }} </td>
+                    <td> {{ user.id }} </td>
+                    <td> {{ user.id }} </td>
+                    <td> {{ user.id }} </td>
+                    <td> {{ user.id }} </td>
+                </tr>
+            {% endfor %}
+        {% else %}
+        <tr colspan="7" ><td>There is no user.</td></tr>
+        {% endif %}
+    </tbody>
+
+</table>
+
+</section>
+<br><br>
+
+<!-- Property -->
+<section id="propertysection" class="pending-approvals">
+<tabel-title><h3> Property 
+
+    <span class=" badge bg-primary" > Listed Property {{ properties_listed }}  </span> 
+    <span class=" badge bg-success" > Approved Property {{ active_listed }}  </span>
+    <span class=" badge bg-warning" > Pending Property {{ pending_properties_count }}  </span>
+    <span class=" badge bg-danger" > Rejected Property {{ reject_properties_count }}  </span>
+</h3>  </tabel-title>
+<table class="table table-hover" >  
+    <thead>
+        
+        <tr>
+            <th>ID</th>
+            <th>Property</th>
+            <th>Property Type</th>
+            <th>Location</th>
+            <th>Property Status</th>
+            <th>Admin Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if properties %}
+            {% for property in properties %}
+                <tr>
+                    <td> {{ property.id }} </td>
+                    <td> {{ property.name }} </td>
+
+                    <td>
+                          
+
+                         {% if property.property_type == 'HOUSE' %}
+
+                                <span class="badge bg-primary" > House </span>
+
+                            {% elif property.property_type == 'APARTMENT' %}
+
+                                <span class="badge bg-danger" > Apartment </span>
+
+                            {% elif property.property_type == 'CONDO' %}
+
+                                <span class="badge bg-warning" > Condo </span>
+
+                            {% elif property.property_type == 'HOSTEL' %}
+
+                                <span class="badge bg-success" > Hostel </span>
+
+                            {% endif %}
+
+                    </td>
+
+
+    
+                    <td>{{ property.city.name }} /{{ property.region.name }} </td>
+
+
+                    <td>
+                         
+
+                           {% if property.status == 'AVAILABLE' %}
+
+                                <span class="badge bg-success" >Available</span>
+
+                            {% elif property.status == 'BOOKED' %}
+
+                                <span class="badge bg-warning" >Booked</span>
+
+                            {% elif property.status == 'RENTED' %}
+
+                                <span class="badge bg-secondary" > Rented </span>
+
+                            {% elif property.status == 'MAINTENANCE' %}
+
+                                <span class="badge bg-danger" > Under Maintenance </span>
+
+                            {% endif %}
+                        
+                    </td>
+
+
+
+                    <td>
+
+                          
+
+                         {% if property.admin_approved == 'APPROVED'  %}
+
+
+                          <span class="badge bg-success" > {{ property.admin_approved }} </span>
+
+                         {% elif property.admin_approved == 'PENDING' %}
+
+                         <span class="badge bg-warning" > {{ property.admin_approved }} </span>
+
+                         {% else %}
+
+                         <span class="badge bg-danger" > Rejected </span>
+
+                         {% endif %}
+
+                    </td>
+                    <td>
+                        
+
+                        {% if property.admin_approved == 'APPROVED' %}
+
+                            <button class="btn btn-success disabled" > Approve </button>
+                            <button class="btn btn-warning" onclick="pendingProperty(event,{{ property.id }})" > Pending </button>
+                            <button class="btn btn-danger" onclick="rejectProperty(event,{{ property.id }})"> Reject </button>
+
+                        {% elif property.admin_approved == 'PENDING' %}
+
+                            <button class="btn btn-success" onclick="approveProperty(event,{{ property.id }})" > Approve </button>
+                            <button class="btn btn-warning disabled" > Pending </button>
+                            <button class="btn btn-danger" onclick="rejectProperty(event,{{ property.id }})" > Reject </button>
+
+                        {% elif property.admin_approved == 'REJECT' %}
+
+                            <button class="btn btn-success " onclick="approveProperty(event,{{ property.id }})"> Approve </button>
+                            <button class="btn btn-warning" onclick="pendingProperty(event,{{ property.id }})"> Pending </button>
+                            <button class="btn btn-danger disabled" > Reject </button>
+
+                        {% endif %}
+                    </td>
+
+                    <script>
+
+                        
+
+                        
+                    </script>
+                  
+                </tr>
+            {% endfor %}
+        {% else %}
+        <tr colspan="6" ><td>There is no Property.</td></tr>
+        {% endif %}
+    </tbody>
+
+</table>
+
+</section>
+<br><br>
+
+<!-- Agency -->
+<section id="agency" class="pending-approvals">
+<tabel-title><h3> Agency </h3></tabel-title>
+<table class="table table-hover" >
+
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Agency</th>
+            <th>Name</th>
+            <th>Listed</th>
+            <th>Active List</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if agencies %}
+            {% for agency in agencies %}
+                <tr>
+                    <td> {{ agency.id }} </td>
+                    <td> {{ agency.username }} </td>
+                    
+                   
+                  
+                </tr>
+            {% endfor %}
+        {% else %}
+        <tr colspan="3" ><td>There is no Agency.</td></tr>
+        {% endif %}
+    </tbody>
+
+</table>
+
+</section>
+<br><br>
+
+<!-- Location -->
+<section id="location" class="pending-approvals">
+<tabel-title><h2> Location </h2></tabel-title>
+<hr>
+<div class="row">
+    <h3> Region </h3>
+    <div class="col-5">
+        <table class="table table-hover" >
+
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Region</th>
+         
+            <th>Action</th>
+        </tr>
+    </thead>
+     <tbody>
+        {% if regions %}
+            {% for region in regions %}
+                <tr>
+                    <td> {{ region.id }} </td>
+                    <td> {{ region.name }} </td>
+
+                    <td>
+                        <div class="btn-group-sm btn-group" >
+                        <button class="btn btn-warning" onclick="editRegion(event,{{ region.id }}  )" >Edit</button>
+                        <button class="btn btn-danger" onclick="deleteRegion(event,{{ region.id }})" >Delete</button>
+                        </div>
+                        
+                    </td>
+
+                   
+                    
+                   
+                  
+                </tr>
+            {% endfor %}
+        {% else %}
+        <tr colspan="3" ><td>There is no Agency.</td></tr>
+        {% endif %}
+    </tbody>
+
+</table>
+    </div>
+
+    <div class="col-5">
+         <!-- Region Form -->
+          
+            <div class="card mb-4 shadow-sm rounded ">
+                <div class="card-header bg-primary text-white fw-semibold">
+                    Add a New Region
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                    {% csrf_token %}
+                   
+                    {{ regionForm.as_p }}
+                    <button type="submit" id="submitBtn" class="btn btn-primary w-100">Add Region</button>
+                    </form>
+
+                    
+                </div>
+            </div>
+    </div>
+</div>
+
+<br>
+<hr>
+
+<div class="row">
+
+    <h3> City </h3>
+    <div class="col-5">
+
+        <table class="table table-hover" >
+
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>City</th>
+            <th>Region</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+     <tbody>
+        {% if cities %}
+            {% for city in cities %}
+                <tr>
+                    <td> {{ city.id }} </td>
+                    <td> {{ city.name }} </td>
+                    <td> {{ city.region.name }} </td>
+                    <td>
+                        <div class="btn-group-sm btn-group" >
+                        <button class="btn btn-warning" >Edit</button>
+                        <button class="btn btn-danger" >Delete</button>
+                        </div>
+                        
+                    </td>
+                    
+                   
+                  
+                </tr>
+            {% endfor %}
+        {% else %}
+        <tr colspan="3" ><td>There is no Agency.</td></tr>
+        {% endif %}
+    </tbody>
+
+</table>
+
+    </div>
+
+    <div class="col-5">
+        <!-- City Form -->
+            <div class="card mb-4 shadow-sm rounded ">
+                <div class="card-header bg-primary text-white fw-semibold">
+                    Add a New City
+                </div>
+                <div class="card-body">
+                    <form method="post" class="">
+                        {% csrf_token %}
+                        <div class="">
+                            {{ cityForm.as_p }}
+                        </div>
+                        <div >
+                            <button type="submit" name="add_city" class="btn btn-primary form-control">Add City</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+    </div>
+
+</div>
+
+
+
+</section>
+<br><br>
+
+<!-- Review -->
+<section id="review" class="pending-approvals">
+<tabel-title><h3> Review </h3></tabel-title>
+<table class="table table-hover" >
+
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Property</th>
+            <th>User</th>
+            <th>Rating</th>
+            <th>Comment</th>
+            <th>Time</th>
+            
+        </tr>
+    </thead>
+    <tbody>
+        {% if reviews %}
+            {% for review in reviews %}
+                <tr>
+                    <td> {{ review.id }} </td>
+                    <td> {{ review.property.name }} </td>
+                    <td> {{ review.user.username }} </td>
+                    <td> {{ review.rating }} <span class="fa fa-star"></span> </td>
+                    <td> {{ review.comment }} </td>
+                    <td> {{ review.created_at | timesince }} ago </td>
+                    
+                    
+                   
+                  
+                </tr>
+            {% endfor %}
+        {% else %}
+        <tr colspan="3" ><td>There is no Agency.</td></tr>
+        {% endif %}
+    </tbody>
+
+</table>
+
+</section>
+<br><br>
+
+
+
+
+        
+       
+
+<script>
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -673,8 +1104,117 @@
             alert("Request failed");
         });
     }
-</script>
-<script>
+
+
+    
+    function pendingProperty(event,propertId){
+            event.preventDefault();
+            console.log("Approve Property Btn Clicked", propertId)
+            const property_url = `/api/property/${propertId}/`;
+
+            fetch(property_url,{
+                method : 'PATCH',
+                headers : {
+                    'Content-Type':'application/json',
+                    'X-CSRFToken':csrftoken
+                },
+                body : JSON.stringify({
+
+                    admin_approved: 'PENDING'
+
+                })
+            })
+            .then(response => {
+                console.log(response)
+                if (response.ok){
+
+                    console.log("Successfully Pended Property", propertId)
+                    alert("Successfully Pended Property", propertId)
+                    location.reload();
+                }
+                else{
+                    console.log("Error Occur When Pended Property",propertId)
+                    alert("Error Occur When Pended Property",propertId)
+                }
+            })
+            .catch(error => {
+                console.log (error)
+            })
+
+        }
+
+    function approveProperty(event,propertId){
+            event.preventDefault();
+            console.log("Approve Property Btn Clicked", propertId)
+            const property_url = `/api/property/${propertId}/`;
+
+            fetch(property_url,{
+                method : 'PATCH',
+                headers : {
+                    'Content-Type':'application/json',
+                    'X-CSRFToken':csrftoken
+                },
+                body : JSON.stringify({
+
+                    admin_approved: 'APPROVED'
+
+                })
+            })
+            .then(response => {
+                console.log(response)
+                if (response.ok){
+
+                    console.log("Successfully Approved Property", propertId)
+                    alert("Successfully Approved Property", propertId)
+                    location.reload();
+                }
+                else{
+                    console.log("Error Occur When Approved Property",propertId)
+                    alert("Error Occur When Approved Property",propertId)
+                }
+            })
+            .catch(error => {
+                console.log (error)
+            })
+
+        }
+        
+    function rejectProperty(event,propertId){
+            event.preventDefault();
+            console.log("Approve Property Btn Clicked", propertId)
+            const property_url = `/api/property/${propertId}/`;
+
+            fetch(property_url,{
+                method : 'PATCH',
+                headers : {
+                    'Content-Type':'application/json',
+                    'X-CSRFToken':csrftoken
+                },
+                body : JSON.stringify({
+
+                    admin_approved: 'REJECT'
+
+                })
+            })
+            .then(response => {
+                console.log(response)
+                if (response.ok){
+
+                    console.log("Successfully Rejected Property", propertId)
+                    alert("Successfully Rejected Property", propertId)
+                    location.reload();
+                }
+                else{
+                    console.log("Error Occur When Rejected Property",propertId)
+                    alert("Error Occur When Rejected Property",propertId)
+                }
+            })
+            .catch(error => {
+                console.log (error)
+            })
+
+        }
+
 
         // Properties Chart
         const propertiesCtx = document.getElementById('propertiesChart').getContext('2d');
@@ -692,7 +1232,7 @@
                         '#dc3545',
                         '#17a2b8'
                     ],
-                    borderWidth: 0
+                    borderWidth: 1
                 }]
             },
             options: {
@@ -718,6 +1258,8 @@
                 }
             }
         });
+
+
         
         // Users Chart
         const usersCtx = document.getElementById('usersChart').getContext('2d');
@@ -755,6 +1297,77 @@
                 }
             }
         });
-    </script>
+
+
+
+
+
+
+
+
+ 
+
+                        function editRegion(event,regionId,regionName){
+                            event.preventDefault();
+                            console.log("Edit Region Button clicked")
+                            console.log(regionId,regionName)
+
+                            Name = prompt("Edit Name")
+
+                            edit_region_url = `/api/regions/${regionId}/`;
+
+                            fetch (edit_region_url,{
+                                method : 'PUT',
+                                 headers : {
+                                        'Content-Type' : 'application/json',
+                                        'X-CSRFToken' : csrftoken
+                                    },
+                                body: JSON.stringify({
+                                    name: Name
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                        
+                            })
+                        
+
+                               
+                        }
+
+                        function deleteRegion(event,regionId){
+                            event.preventDefault();
+                            console.log("Delete Region Button Clicked",regionId)
+
+                            delete_region_url = `/api/regions/${regionId}/`;
+                            fetch(delete_region_url,
+                                {
+                                    method : 'DELETE',
+                                    headers : {
+                                        'Content-Type' : 'application/json',
+                                        'X-CSRFToken' : csrftoken
+                                    }
+                                }
+                               
+                            )
+                            .then(response => {
+                                if (response.ok){
+                                    console.log("Successfully Delete ", regionId)
+                                }
+                                else {
+                                    console.log("Error Occur Delete Region.")
+                                }
+                            })
+                            .catch(error => {
+                                console.log(error)
+                            })
+
+                        }
+
+                    
+
+</script>
+
+
 </body>
 </html>

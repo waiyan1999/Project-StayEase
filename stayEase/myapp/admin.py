@@ -1,5 +1,5 @@
 from django.contrib import admin
-from myapp.models import CustomUser,CustomerProfile,AgencyProfile,OwnerProfile,Region,City,Property,Review,SaveProperty,Inquiry
+from myapp.models import CustomUser,CustomerProfile,AgencyProfile,OwnerProfile,Region,City,Property,Review,SaveProperty,Inquiry,ContactMessage
 
 admin.site.register(CustomUser)
 admin.site.register(CustomerProfile)
@@ -11,3 +11,4 @@ admin.site.register(Property)
 admin.site.register(Review)
 admin.site.register(SaveProperty)
 admin.site.register(Inquiry)
+admin.site.register(ContactMessage)

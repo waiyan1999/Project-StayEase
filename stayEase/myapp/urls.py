@@ -49,6 +49,8 @@ urlpatterns = [
     path('agency-setting/',views.agencySetting,name='agency_setting'),
     
     path('payment/<int:pk>/', views.payment, name='payment'),
+    
+    path('send-message/',views.send_message_view,name='send_message')
 
     
     

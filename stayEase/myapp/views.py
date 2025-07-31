@@ -39,7 +39,7 @@ from .form import PropertyForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .models import Property, Inquiry, Review
+from .models import Property, Inquiry, Review,ContactMessage
 from .form import PropertyForm
 
 def base(request):
@@ -147,13 +147,23 @@ def index(request):
 def admin_dashboard(request):
     # Stats data
     total_users = CustomUser.objects.count()
-    print(total_users-1)
+    
     properties_listed = Property.objects.count()
+    
+    active_listed = Property.objects.filter(admin_approved = 'APPROVED').count()
     agencies_registered = CustomUser.objects.filter(role='AGENCY').count()  # Fixed role filter
     average_rating = Review.objects.aggregate(avg_rating=Avg('rating'))['avg_rating'] or 0
+    
     pending_properties = Property.objects.filter( admin_approved = 'PENDING')
+    pending_properties_count = pending_properties.count()
+    
+    reject_properties = Property.objects.filter( admin_approved = 'REJECT')
+    reject_properties_count = reject_properties.count()
+    
+    
+    
     recent_logs = LogEntry.objects.select_related('content_type')\
-    .order_by('-action_time')[:10]  # limit to last 10 actions
+    .order_by('-action_time')[:3]  # limit to last 10 actions
     
     # Property type distribution - case-insensitive grouping
     property_types = (
@@ -175,6 +185,16 @@ def admin_dashboard(request):
         {'type': 'Admins', 'count': CustomUser.objects.filter(is_staff=True).count()},
     ]
     
+    regionForm=RegionForm()
+    cityForm = CityForm()
+    regions = Region.objects.all()
+    cities = City.objects.all()
+    customer_user = CustomUser.objects.filter(role = 'CUSTOMER')
+    agencies = CustomUser.objects.filter( role = "AGENCY")
+    properties = Property.objects.all()
+    reviews = Review.objects.all()
+    
+    
     context = {
         'total_users': total_users-agencies_registered-1,
         'properties_listed': properties_listed,
@@ -184,10 +204,35 @@ def admin_dashboard(request):
         'property_counts': property_counts,
         'user_types': user_types,
         'pending_properties':pending_properties,
-        'recent_logs':recent_logs
+        'recent_logs':recent_logs,
+        'regionForm':regionForm,
+        'cityForm':cityForm,
+        'regions':regions,
+        'cities':cities,
+        'customer_user':customer_user,
+        'properties':properties,
+        'agencies':agencies,
+        'reviews': reviews,
+        'active_listed':active_listed,
+        'pending_properties_count':pending_properties_count,
+        'reject_properties_count':reject_properties_count
     }
     
-    print(f'pendign properties {pending_properties}')
+    if request.method == 'POST':
+        regionForm = RegionForm(request.POST)
+        if regionForm.is_valid():
+            regionForm.save()
+            print("Successfully Create New Region")
+
+        else:
+            print("Error creating New Region")
+            
+        cityForm = CityForm(request.POST)
+        if cityForm.is_valid():
+            cityForm.save()
+            print("Successfully Create New City")
+        else:
+            print("Error Creating New City")
     
     return render(request, 'admin-dashboard.html', context)
 
@@ -735,6 +780,9 @@ def agencyDashboard(request):
 
 
 
+
+
+
 def service(request):
     return render(request,'base/service.html')
 
@@ -748,6 +796,26 @@ def contact(request):
 def agencySetting(request):
     return render(request,'agency-setting.html')
 
+def send_message_view(request):
+    if request.method == 'POST':
+        name = request.user
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        subject = request.POST.get('subject')
+        message = request.POST.get('message')
+
+        # Save to model
+        ContactMessage.objects.create(
+            sender=name,
+            sender_email=email,
+            sender_phone=phone,
+            sender_subject=subject,
+            sender_message=message
+        )
+        messages.success(request, "Your message has been sent successfully!")
+        #return redirect('send_message')  # Replace with your desired redirect URL name
+
+    return redirect('contact') # Replace with your actual template
 
 
 

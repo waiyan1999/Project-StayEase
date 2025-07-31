@@ -3,22 +3,24 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-4 mb-4 mb-lg-0">
-                    <h5 class="text-uppercase fw-bold mb-4">PrimeStay</h5>
+                    <h5 class="text-uppercase fw-bold mb-4"> StayEase </h5>
                     <p>Premium rental property solutions with exceptional service for owners and tenants alike.</p>
                     <div class="mt-4">
-                        <p>&copy; 2023 PrimeStay. All rights reserved.</p>
+                        <p>&copy; 2025 StayEase. All rights reserved.</p>
                     </div>
                 </div>
                 <div class="col-lg-2 col-md-6 mb-4 mb-md-0">
                     <h6 class="text-uppercase fw-bold mb-4">Quick Links</h6>
                     <ul class="list-unstyled footer-links">
-                        <li class="mb-2"><a href="#">Home</a></li>
-                        <li class="mb-2"><a href="#properties">Properties</a></li>
-                        <li class="mb-2"><a href="#services">Services</a></li>
-                        <li class="mb-2"><a href="#about">About Us</a></li>
-                        <li class="mb-2"><a href="#contact">Contact</a></li>
+                        <li class="mb-2"><a href="{% url 'index' %}">Home</a></li>
+                        <li class="mb-2"><a href="{% url 'property' %}">Properties</a></li>
+                        <li class="mb-2"><a href="{% url 'service' %}">Services</a></li>
+                        <li class="mb-2"><a href="{% url 'about' %}">About Us</a></li>
+                        <li class="mb-2"><a href="{% url 'contact' %}">Contact</a></li>
                     </ul>
                 </div>
+
+                {% comment %}
                 <div class="col-lg-2 col-md-6 mb-4 mb-md-0">
                     <h6 class="text-uppercase fw-bold mb-4">For Owners</h6>
                     <ul class="list-unstyled footer-links">
@@ -29,13 +31,15 @@
                         <li class="mb-2"><a href="#">Sign In</a></li>
                     </ul>
                 </div>
+                {% endcomment %}
+
                 <div class="col-lg-4">
                     <h6 class="text-uppercase fw-bold mb-4">Newsletter</h6>
                     <p>Subscribe to receive market updates and property listings.</p>
                     <form class="mt-4">
                         <div class="input-group">
                             <input type="email" class="form-control" placeholder="Your email address" required>
-                            <button class="btn btn-accent" type="submit">Subscribe</button>
+                            <button class="btn btn-outline-primary" type="submit">Subscribe</button>
                         </div>
                     </form>
                 </div>
