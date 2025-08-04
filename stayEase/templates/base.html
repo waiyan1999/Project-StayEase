@@ -114,13 +114,7 @@
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    var toastElList = [].slice.call(document.querySelectorAll('.toast'));
-    toastElList.forEach(function (toastEl) {
-      var toast = new bootstrap.Toast(toastEl);
-      toast.show();
-    });
-  });
+ 
 </script>
 
 
@@ -145,6 +139,14 @@
  
 
 <script>
+ document.addEventListener('DOMContentLoaded', function () {
+    var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+    toastElList.forEach(function (toastEl) {
+      var toast = new bootstrap.Toast(toastEl);
+      toast.show();
+    });
+  });
+
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -222,6 +224,38 @@ function unSaveProperty(event,savedId) {
     console.error("Error unsaving property:", error);
     alert("Something went wrong.");
   });
+}
+
+function propertyCheckOut(event,inquiryId){
+  event.preventDefault();
+  console.log("Checkout Button Clicked" + inquiryId)
+  const inquiry_url = `/api/inquiries/${inquiryId}/`;
+
+  fetch (inquiry_url,{
+    method : 'DELETE',
+    headers : {
+      'Content-Type' :'application/json',
+      'X-CSRFToken' : csrftoken
+    }
+  })
+  .then(response => {
+    if(response.ok){
+      console.log("Successfully Check Out" + inquiryId)
+      alert("Successfully Check Out" + inquiryId)
+      location.reload()
+    }
+    else{
+      console.log("Error Occur When Check Out" + inquiryId)
+      alert("Error Occur When Check Out" + inquiryId)
+      location.reload()
+    }
+  })
+  .catch(error => {
+    console.log("Error",error)
+  })
+
+  
+
 }
 
 </script>

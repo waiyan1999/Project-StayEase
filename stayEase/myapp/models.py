@@ -12,7 +12,6 @@ class CustomUser(AbstractUser):
     )
     
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='CUSTOMER')
-    phone = models.CharField(max_length=15, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
      
@@ -23,13 +22,15 @@ class CustomUser(AbstractUser):
 
 class CustomerProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='customer_profile')
-    customer_name = models.CharField(max_length=100)
+    customer_full_name = models.CharField(max_length=100)
+    phone = models.CharField(max_length=15,blank=True,null=True)
+    email = models.EmailField(blank=True,null=True)
     date_of_birth = models.DateField(null=True, blank=True)
     profile_photo = models.ImageField(upload_to='customer_profiles/', blank=True)
     address = models.TextField(blank=True)
     
     def __str__(self):
-        return f'Customer: {self.customer_name}'
+        return f'Customer: {self.customer_full_name}'
 
 class AgencyProfile(models.Model):
     
@@ -41,6 +42,8 @@ class AgencyProfile(models.Model):
     
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='agency_profile')
     agency_name = models.CharField(max_length=100)
+    phone = models.CharField(max_length=15,blank=True,null=True)
+    email = models.EmailField(blank=True,null=True)
     contact_person = models.CharField(max_length=100)
     license_number = models.CharField(max_length=50, blank=True)
     license_status = models.CharField(max_length=20,choices=LICENSE_STATUS,default='PENDING')
@@ -169,11 +172,11 @@ class SaveProperty(models.Model):
 class Inquiry(models.Model):
     customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE,related_name='sent_inquiries')
     agency_owner = models.ForeignKey(CustomUser,on_delete=models.CASCADE,related_name='received_inquiries' )
-    property = models.ForeignKey(Property,on_delete=models.CASCADE,related_name='inquiries')
+    property = models.OneToOneField(Property,on_delete=models.CASCADE,related_name='inquiries')
     message = models.CharField(max_length=255, blank=True,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     edited_at = models.DateTimeField(auto_now=True)
-    is_replied = models.BooleanField(default=False)
+    is_purchased = models.BooleanField(default=False)
     is_approved = models.BooleanField(default=False)
     
     def __str__(self):
@@ -184,6 +187,13 @@ class Inquiry(models.Model):
         self.save()
         self.property.status = 'BOOKED'  # or your appropriate status
         self.property.save()
+        
+    def delete(self, *args, **kwargs):
+        # Set property status to AVAILABLE if rented by this inquiry
+        if self.is_purchased and self.property.status == 'RENTED':
+            self.property.status = 'AVAILABLE'
+            self.property.save()
+        super().delete(*args, **kwargs)
         
 
 class ContactMessage(models.Model):

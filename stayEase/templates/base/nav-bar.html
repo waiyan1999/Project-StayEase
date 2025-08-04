@@ -1,137 +1,49 @@
 {% load static %}
 
-{% if user.role == 'CUSTOMER' or not user.is_authenticated %}
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
     <div class="container">
-        <!-- Brand with logo -->
+        <!-- Brand -->
         <a class="navbar-brand d-flex align-items-center" href="{% url 'index' %}">
             <img src="" alt="" height="36" class="me-2">
             <span class="fw-bold fs-4 text-gradient">StayEase</span>
         </a>
-        
-        <!-- Mobile toggle button -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+
+        <!-- Mobile toggle -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
+                data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" 
+                aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        
-        <!-- Navigation links -->
+
+        <!-- Menu -->
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav mx-auto">
-                <li class="nav-item">
-                    <a class="nav-link position-relative" href="{% url 'index' %}">
-                        <i class="fas fa-home me-1"></i>Home
-                        <span class="nav-indicator"></span>
-                        
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link position-relative" href="{% url 'property' %}">
-                        <i class="fas fa-building me-1"></i>Properties
-                        <span class="nav-indicator"></span>
-                    </a>
-                </li>
-
-                {% comment %}
-                <li class="nav-item">
-                    <a class="nav-link position-relative" href="{% url 'agency' %}">
-                        <i class="fas fa-city me-1"></i>Agency
-                        <span class="nav-indicator"></span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link position-relative" href="{% url 'owner' %}">
-                        <i class="fas fa-user-tie me-1"></i>Owner
-                        <span class="nav-indicator"></span>
-                    </a>
-                </li>
-                
-                <li class="nav-item">
-                    <a class="nav-link position-relative" href="{% url 'location' %}">
-                        <i class="fas fa-map-marker-alt me-1"></i>Location
-                        <span class="nav-indicator"></span>
-                    </a>
-                </li>
-                {% endcomment %}
-                
-                
-                <li class="nav-item">
-                    <a class="nav-link position-relative" href="{% url 'service' %}">
-                        <i class="fas fa-concierge-bell me-1"></i>Services
-                        <span class="nav-indicator"></span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link position-relative" href="{% url 'about' %}">
-                        <i class="fas fa-info-circle me-1"></i>About
-                        <span class="nav-indicator"></span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link position-relative" href="{% url 'contact' %}">
-                        <i class="fas fa-envelope me-1"></i>Contact
-                        <span class="nav-indicator"></span>
-                    </a>
-                </li>
-                
+                <li class="nav-item"><a class="nav-link position-relative" href="{% url 'index' %}"><i class="fas fa-home me-1"></i>Home<span class="nav-indicator"></span></a></li>
+                <li class="nav-item"><a class="nav-link position-relative" href="{% url 'property' %}"><i class="fas fa-building me-1"></i>Properties<span class="nav-indicator"></span></a></li>
+                <li class="nav-item"><a class="nav-link position-relative" href="{% url 'service' %}"><i class="fas fa-concierge-bell me-1"></i>Services<span class="nav-indicator"></span></a></li>
+                <li class="nav-item"><a class="nav-link position-relative" href="{% url 'about' %}"><i class="fas fa-info-circle me-1"></i>About<span class="nav-indicator"></span></a></li>
+                <li class="nav-item"><a class="nav-link position-relative" href="{% url 'contact' %}"><i class="fas fa-envelope me-1"></i>Contact<span class="nav-indicator"></span></a></li>
             </ul>
-            
+
             <!-- Right side actions -->
             <div class="d-flex align-items-center ms-lg-3">
-                {% if user.role == 'AGENCY' or user.role == 'OWNER' or user.role == 'ADMIN' %}
-                <a href="#" class="btn btn-primary me-3 position-relative overflow-hidden">
-                    <span class="btn-pulse"></span>
-                    <i class="fas fa-plus-circle me-2"></i>List Property
-                </a>
-                {% endif %}
-                
                 <div class="dropdown">
                     {% if user.is_authenticated %}
                     <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" 
                        id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        {% if user.role == 'AGENCY' %}
-                        <div class="avatar bg-gradient-primary me-2">
-                            <i class="fas fa-city"></i>
-                        </div>
-                        {% elif user.role == 'OWNER' %}
-                        <div class="avatar bg-gradient-warning me-2">
-                            <i class="fas fa-user-tie"></i>
-                        </div>
-                        {% elif user.role == 'ADMIN' %}
-                        <div class="avatar bg-gradient-danger me-2">
-                            <i class="fas fa-crown"></i>
-                        </div>
-                        {% else %}
-                        <div class="avatar bg-gradient-success me-2">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        {% endif %}
+                        <div class="avatar bg-gradient-success me-2"><i class="fas fa-user"></i></div>
                         <span class="d-none d-lg-inline">{{ user.username }}</span>
                     </a>
-                    <ul class="dropdown-menu " aria-labelledby="userDropdown">
-                        <li><a class="dropdown-item" href="{% url 'profile' %}">
-                            <i class="fas fa-user me-2"></i>Profile
-                        </a></li>
-
-                        {% comment %}
-                        <li><a class="dropdown-item" href="#">
-                            <i class="fas fa-cog me-2"></i>Settings
-                        </a></li>
-                        {% endcomment %}
-
-
+                    <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user me-2"></i>Profile</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="{% url 'logout_user' %}">
-                            <i class="fas fa-sign-out-alt me-2"></i>Logout
-                        </a></li>
+                        <li><a class="dropdown-item" href="{% url 'logout_user' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
                     </ul>
                     {% else %}
                     <div class="btn-group">
-                        <a href="{% url 'login_user' %}" class="btn btn-outline-light me-2">
-                            <i class="fas fa-sign-in-alt me-2"></i>Log In
-                        </a>
-                        <a href="{% url 'register_user' %}" class="btn btn-primary">
-                            <i class="fas fa-user-plus me-2"></i>Sign Up
-                        </a>
+                        <a href="{% url 'login_user' %}" class="btn btn-outline-light me-2"><i class="fas fa-sign-in-alt me-2"></i>Log In</a>
+                        <a href="{% url 'register_user' %}" class="btn btn-primary"><i class="fas fa-user-plus me-2"></i>Sign Up</a>
                     </div>
                     {% endif %}
                 </div>
@@ -139,88 +51,77 @@
         </div>
     </div>
 </nav>
-{% endif %}
 
 <style>
-    /* Custom styling for enhanced appearance */
-    .text-gradient {
-        background: linear-gradient(90deg, #4e73ff, #8a2be2);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+/* Brand text gradient */
+.text-gradient {
+    background: linear-gradient(90deg, #8cc36b, #9db86a);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Navbar background + shadow */
+.navbar {
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    background: linear-gradient(90deg, #568fea, #16213e) !important;
+    padding: 0.8rem 1rem;
+}
+
+/* Nav links */
+.nav-link {
+    position: relative;
+    padding: 0.5rem 1rem;
+    margin: 0 0.25rem;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #4e73ff !important;
+}
+
+.nav-link .nav-indicator {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #4e73ff;
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover .nav-indicator {
+    width: 100%;
+}
+
+/* Avatar icon circle */
+.avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Dropdown menu styling */
+.dropdown-menu {
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+/* Button hover */
+.btn-outline-light:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+/* Mobile tweak */
+@media (max-width: 992px) {
+    .navbar-nav {
+        text-align: left-aligned;
     }
-    
-    .nav-link {
-        position: relative;
-        padding: 0.5rem 1rem;
-        margin: 0 0.25rem;
-        transition: all 0.3s ease;
+    .navbar-nav .nav-item {
+        margin-bottom: 0.5rem;
     }
-    
-    .nav-link:hover {
-        color: #4e73ff !important;
-    }
-    
-    .nav-link .nav-indicator {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 0;
-        height: 2px;
-        background: linear-gradient(90deg, #4e73ff, #4e73ff);
-        transition: width 0.3s ease;
-    }
-    
-    .nav-link:hover .nav-indicator {
-        width: 100%;
-    }
-    
-    .avatar {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .btn-pulse {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        border-radius: inherit;
-        background: rgba(255, 255, 255, 0.1);
-        animation: pulse 2s infinite;
-        z-index: -1;
-    }
-    
-    @keyframes pulse {
-        0% { transform: scale(1); opacity: 1; }
-        100% { transform: scale(1.5); opacity: 0; }
-    }
-    
-    .dropdown-menu {
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 10px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    }
-    
-   
-    
-    
-    
-    .navbar {
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-        background: linear-gradient(90deg, #568fea, #16213e) !important;
-        padding: 0.8rem 1rem;
-    }
-    
-    .navbar-nav .nav-link.active {
-        color: #4e73ff !important;
-    }
-    
-    .navbar-nav .nav-link.active .nav-indicator {
-        width: 100%;
-    }
+}
 </style>
+

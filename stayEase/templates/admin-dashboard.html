@@ -439,7 +439,7 @@
                 <span>Agencies</span>
             </a>
             <a href="#recent" class="menu-item">
-                <i class="fas fa-user-tie"></i>
+                <i class="fas fa-history"></i>
                 <span>Recent</span>
             </a>
             <a href="#approval" class="menu-item">
@@ -651,15 +651,17 @@
 
 <!-- Users -->
 <section id="user" class="pending-approvals">
-<tabel-title><h3> User </h3></tabel-title>
+<tabel-title><h3> User  <span class="badge bg-primary">Total Customer {{customer_user_count}} </span> </h3></tabel-title>
 <table class="table table-hover" >
 
     <thead>
         <tr>
             <th>ID</th>
             <th>Name</th>
+            {% comment %}
             <th>Inquiry</th>
             <th>Saved List</th>
+            {% endcomment %}
             <th>Action</th>
         </tr>
     </thead>
@@ -670,10 +672,14 @@
                 <tr>
                     <td> {{ user.id }} </td>
                     <td> {{ user.username }} </td>
+                    {% comment  %}
+                    <td> {{ user_inquiry_count }} </td>
                     <td> {{ user.id }} </td>
-                    <td> {{ user.id }} </td>
-                    <td> {{ user.id }} </td>
-                    <td> {{ user.id }} </td>
+                    {% endcomment %}
+                    <td> 
+                        <button class="btn btn-info" >Profile</button>
+                    </td>
+                    
                 </tr>
             {% endfor %}
         {% else %}
@@ -724,11 +730,11 @@
 
                             {% elif property.property_type == 'APARTMENT' %}
 
-                                <span class="badge bg-danger" > Apartment </span>
+                                <span class="badge bg-warning" > Apartment </span>
 
                             {% elif property.property_type == 'CONDO' %}
 
-                                <span class="badge bg-warning" > Condo </span>
+                                <span class="badge bg-success" > Condo </span>
 
                             {% elif property.property_type == 'HOSTEL' %}
 
@@ -833,16 +839,18 @@
 
 <!-- Agency -->
 <section id="agency" class="pending-approvals">
-<tabel-title><h3> Agency </h3></tabel-title>
+<tabel-title><h3> Agency <span class="badge bg-primary" >Total Agency {{agencies_registered}} </span> </h3></tabel-title>
 <table class="table table-hover" >
 
     <thead>
         <tr>
             <th>ID</th>
-            <th>Agency</th>
-            <th>Name</th>
+            
+            <th>Agency Name</th>
+            {% comment %}
             <th>Listed</th>
             <th>Active List</th>
+            {% endcomment  %}
             <th>Action</th>
         </tr>
     </thead>
@@ -852,6 +860,10 @@
                 <tr>
                     <td> {{ agency.id }} </td>
                     <td> {{ agency.username }} </td>
+
+                    <td>
+                        <button class="btn btn-info" >Profile</button>
+                    </td>
                     
                    
                   

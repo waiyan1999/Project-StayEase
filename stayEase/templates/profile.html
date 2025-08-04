@@ -3,190 +3,387 @@
 {% block title %}{{ user.username }} Profile{% endblock %}
 
 {% block content %}
-
-
-<!-- Navigation -->
 {% include 'base/nav-bar.html' %}
 
-<div class="px-4 py-3">
-    <h1 class="mb-4">Your Profile</h1>
-    
-   
-    
-    <!-- Account-Information -->
-    <div class="card shadow mb-4">
-        <div class="card-header bg-primary text-white">
-            <h2 class="h5 mb-0">Account Information</h2>
+<div class="container py-4">
+
+    <!-- Profile Header -->
+    <div class="mb-4">
+        <h1 class="fw-bold">{{ user.username }}'s Profile</h1>
+        <p class="text-muted">Manage your account, saved properties, and inquiries.</p>
+    </div>
+
+    <!-- Account Information Row -->
+    <div class="row g-4 mb-4">
+
+        <!-- Column 1: Profile -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100 text-center p-3">
+                {% if user.customer_profile.profile_photo %}
+                    <img src="{{ user.customer_profile.profile_photo.url }}" 
+                        class="rounded-circle mb-3 shadow-sm"
+                        style="width:120px;height:120px;object-fit:cover;">
+                {% else %}
+                    <div class="bg-secondary rounded-circle mb-3 d-flex align-items-center justify-content-center shadow-sm"
+                        style="width:120px;height:120px;">
+                        <i class="fas fa-user text-white fs-1"></i>
+                    </div>
+                {% endif %}
+                <h5 class="fw-bold mb-0">{{ user.customer_profile.customer_full_name|default:user.username }}</h5>
+                <p class="text-muted small mb-2">{{ user.email }}</p>
+                <button class="btn btn-primary btn-sm w-100" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                    <i class="fas fa-edit me-1"></i> Edit Profile
+                </button>
+            </div>
         </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <p><strong>Username:</strong> {{ user.username }}</p>
-                    <p><strong>Email:</strong> {{ user.email }}</p>
-                    <p><strong>Phone:</strong> {{ user.phone|default:"Not provided" }}</p>
-                </div>
-                <div class="col-md-6">
-                    <p><strong>Role:</strong> 
-                        <span class="badge 
-                            {% if user.role == 'ADMIN' %}bg-danger
-                            {% elif user.role == 'AGENCY' %}bg-warning text-dark
-                            {% elif user.role == 'OWNER' %}bg-info
-                            {% else %}bg-secondary{% endif %}">
-                            {{ user.get_role_display }}
-                        </span>
-                    </p>
-                    <p><strong>Joined:</strong> {{ user.date_joined|date:"F d, Y" }}</p>
-                    <p><strong>Last Login:</strong> {{ user.last_login|date:"F d, Y H:i" }}</p>
-                </div>
+
+        <!-- Column 2: Personal Details -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100 p-3">
+                <h6 class="fw-bold text-primary mb-3"><i class="fas fa-id-card me-1"></i> Personal Details</h6>
+                <p class="mb-2"><strong>Phone:</strong> {{ user.customer_profile.phone|default:"Not provided" }}</p>
+                <p class="mb-2"><strong>Date of Birth:</strong> {{ user.customer_profile.date_of_birth|date:"F d, Y"|default:"Not provided" }}</p>
+                <p class="mb-0"><strong>Address:</strong> {{ user.customer_profile.address|default:"Not provided" }}</p>
+            </div>
+        </div>
+
+        <!-- Column 3: Account Status -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100 p-3">
+                <h6 class="fw-bold text-primary mb-3"><i class="fas fa-user-shield me-1"></i> Account Status</h6>
+                <p class="mb-2"><strong>Role:</strong> <span class="badge bg-secondary">{{ user.get_role_display }}</span></p>
+                <p class="mb-2"><strong>Joined:</strong> {{ user.date_joined|date:"F d, Y" }}</p>
+                <p class="mb-0"><strong>Last Login:</strong> {{ user.last_login|date:"F d, Y H:i" }}</p>
             </div>
         </div>
     </div>
-    
-  
- 
+
+    {% if sp_list %}
+<!-- Saved Properties Section (table style, old logic intact) -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-primary text-white">
+        <h2 class="h5 mb-0">Saved Properties</h2>
+    </div>
+    <div class="card-body table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Property</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                    <th>Rent</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for property in sp_list %}
+                <tr>
+                    <!-- Image -->
+                    <td style="width:120px">
+                        {% if property.property.primary_image %}
+                            <img src="{{ property.property.primary_image.url }}" 
+                                 style="width:100px;height:70px;object-fit:cover;border-radius:6px;">
+                        {% else %}
+                            <div class="bg-light d-flex align-items-center justify-content-center" 
+                                 style="width:100px;height:70px;border-radius:6px;">
+                                <span class="text-muted">No Image</span>
+                            </div>
+                        {% endif %}
+                    </td>
+
+                    <!-- Property Name -->
+                    <td>{{ property.property.name }}</td>
+
+                    <!-- Location -->
+                    <td>
+                        <i class="fas fa-map-marker-alt text-muted"></i>
+                        {{ property.property.city.name }}, {{ property.property.region.name }}
+                    </td>
+
+                    <!-- Status -->
+                    <td>
+                        {% if property.property.status == 'AVAILABLE' %}
+                            <span class="badge bg-success">Available</span>
+                        {% elif property.property.status == 'BOOKED' %}
+                            <span class="badge bg-warning">Booked</span>
+                        {% elif property.property.status == 'RENTED' %}
+                            <span class="badge bg-secondary">Rented</span>
+                        {% elif property.property.status == 'MAINTENANCE' %}
+                            <span class="badge bg-danger">Under Maintenance</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Rent -->
+                    <td>
+                        {{ property.property.rent_amount }} MMK / {{ property.property.rent_type }}
+                    </td>
+
+                    <!-- Actions -->
+                    <td class="d-flex gap-2">
+                        <!-- Save / Unsave Logic (unchanged) -->
+                        {% if property.property.id in save_property_list %}
+                            {% for saved in saved_porperties %}
+                                {% if saved.user.id == user.id and saved.property.id == property.property.id %}
+                                    <a href="" class="btn btn-sm btn-warning"
+                                       onclick="unSaveProperty(event,{{ saved.id }})">Unsave</a>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <a href="" onclick="saveProperty(event, {{ property.property.id }}, {{ user.id }})"
+                               class="btn btn-sm btn-outline-warning">Save</a>
+                        {% endif %}
+
+                        <!-- View Button -->
+                        <a href="{% url 'property_detail' property.property.id %}" 
+                           class="btn btn-sm btn-primary">View</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted">No saved properties</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
 
 
+    <!-- Customer Inquiry Table (with old Cancel + Payment logic) -->
+    <div class="card shadow mb-4">
+        <div class="card-header bg-primary text-white">
+            <h2 class="h5 mb-0">Customer Inquiry Status</h2>
+        </div>
+        <div class="card-body table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Requester</th>
+                        <th>Owner</th>
+                        <th>Property</th>
+                        <th>Inquiry Status</th>
+                        <th>Property Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for inquiry in customer_inquiry %}
+                    <tr>
+                        <td>{{ inquiry.id }}</td>
+                        <td>{{ inquiry.customer.username }}</td>
+                        <td>{{ inquiry.agency_owner.username }}</td>
+                        <td>{{ inquiry.property }}</td>
+                        <td>
+                            {% if inquiry.is_approved %}
+                                <span class="badge bg-success">Approved</span>
+                            {% else %}
+                                <span class="badge bg-warning">Pending</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if inquiry.property.status == 'AVAILABLE' %}
+                                <span class="badge bg-success">Available</span>
+                            {% elif inquiry.property.status == 'BOOKED' %}
+                                <span class="badge bg-warning">Booked</span>
+                            {% elif inquiry.property.status == 'RENTED' %}
+                                <span class="badge bg-secondary">Rented</span>
+                            {% elif inquiry.property.status == 'MAINTENANCE' %}
+                                <span class="badge bg-danger">Under Maintenance</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="">
+                                <a href="{% url 'inquiry_detail' inquiry.id %}" class="btn btn-outline-info btn-sm">Detail</a>
+                                <a href="{% url 'cancel_inquiry' inquiry.id %}" class="btn btn-outline-danger btn-sm ">Cancel Inquiry</a>
 
-<!-- Property-Management Modal -->
-<div class="modal fade" id="propertyModal" tabindex="-1" aria-labelledby="propertyModalLabel" aria-hidden="true">
+                                {% if inquiry.is_approved %}
+                                    <a href="" class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#paymentModal{{ inquiry.id }}">Payment</a>
+
+                                    
+                                {% else %}
+                                    <a href="" class="btn btn-outline-warning disabled btn-sm">Payment</a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <!-- Customer Rented List -->
+     <div>
+        {% if rented_inquiries %}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-success text-white">
+        <h2 class="h5 mb-0"><i class="fas fa-home me-2"></i>Rented Properties</h2>
+    </div>
+    <div class="card-body table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Property</th>
+                    <th>Location</th>
+                    <th>Rent</th>
+                    <th>Rented On</th>
+                    <th>Agency</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for inquiry in rented_inquiries %}
+                <tr>
+                    <td style="width:100px">
+                        {% if inquiry.property.primary_image %}
+                            <img src="{{ inquiry.property.primary_image.url }}"
+                                 class="rounded" style="width:90px; height:60px; object-fit:cover;">
+                        {% else %}
+                            <div class="bg-light d-flex align-items-center justify-content-center"
+                                 style="width:90px; height:60px; border-radius:6px;">
+                                <span class="text-muted">No Image</span>
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'property_detail' inquiry.property.id %}" class="fw-bold text-decoration-none">
+                            {{ inquiry.property.name }}
+                        </a>
+                    </td>
+                    <td>
+                        <i class="fas fa-map-marker-alt text-muted"></i>
+                        {{ inquiry.property.city.name }}, {{ inquiry.property.region.name }}
+                    </td>
+                    <td>{{ inquiry.property.rent_amount }} MMK / {{ inquiry.property.rent_type }}</td>
+                    <td>{{ inquiry.created_at|date:"M d, Y - H:i" }}</td>
+                    <td>{{ inquiry.agency_owner.username }}</td>
+                    <td>
+                        <button class="btn btn-outline-primary btn-sm" onclick="propertyCheckOut(event,{{inquiry.id}})" >Check Out</button>
+                    </td>
+                   
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted">No rented properties yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+             
+        </table>
+    </div>
+</div>
+{% endif %}
+
+     </div>
+
+</div>
+
+{% for inquiry in customer_inquiry %}
+<!-- Payment Modal -->
+<div class="modal fade" id="paymentModal{{ inquiry.id }}" tabindex="-1" aria-labelledby="paymentModalLabel{{ inquiry.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{% url 'payment' inquiry.id %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="paymentModalLabel{{ inquiry.id }}">Confirm Payment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to proceed with the payment?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning">Pay Now</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <form method="post">
+
+      <form method="post" enctype="multipart/form-data" action="{% url 'profile' %}">
         {% csrf_token %}
-        <div class="modal-header">
-          <h5 class="modal-title" id="propertyModalLabel">Add Property</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        
+        <!-- Modal Header -->
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title" id="editProfileModalLabel">
+            <i class="fas fa-user-edit me-2"></i> Edit Profile
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
 
+        <!-- Modal Body -->
         <div class="modal-body">
           <div class="row g-3">
-
-            <!-- Name -->
+            
+            <!-- Full Name -->
             <div class="col-md-6">
-              {{ form.name.label_tag }}
-              {{ form.name }}
-              {{ form.name.errors }}
+              {{ form.customer_full_name.label_tag }}
+              {{ form.customer_full_name }}
+              {{ form.customer_full_name.errors }}
             </div>
+            
 
-            <!-- Property Type -->
+           
+
+            <!-- Phone -->
             <div class="col-md-6">
-              {{ form.property_type.label_tag }}
-              {{ form.property_type }}
-              {{ form.property_type.errors }}
+              {{ form.phone.label_tag }}
+              {{ form.phone }}
+              {{ form.phone.errors }}
             </div>
 
-            <!-- Description -->
-            <div class="col-12">
-              {{ form.description.label_tag }}
-              {{ form.description }}
-              {{ form.description.errors }}
-            </div>
-
-            <!-- Beds / Baths / Area -->
-            <div class="col-md-4">
-              {{ form.beds.label_tag }}
-              {{ form.beds }}
-              {{ form.beds.errors }}
-            </div>
-            <div class="col-md-4">
-              {{ form.baths.label_tag }}
-              {{ form.baths }}
-              {{ form.baths.errors }}
-            </div>
-            <div class="col-md-4">
-              {{ form.area_sqft.label_tag }}
-              {{ form.area_sqft }}
-              {{ form.area_sqft.errors }}
-            </div>
-
-            <!-- Rent Type / Amount / Deposit -->
-            <div class="col-md-4">
-              {{ form.rent_type.label_tag }}
-              {{ form.rent_type }}
-              {{ form.rent_type.errors }}
-            </div>
-            <div class="col-md-4">
-              {{ form.rent_amount.label_tag }}
-              {{ form.rent_amount }}
-              {{ form.rent_amount.errors }}
-            </div>
-            <div class="col-md-4">
-              {{ form.security_deposit.label_tag }}
-              {{ form.security_deposit }}
-              {{ form.security_deposit.errors }}
-            </div>
-
-            <!-- Region / City -->
+            <!-- Email -->
             <div class="col-md-6">
-              {{ form.region.label_tag }}
-              {{ form.region }}
-              {{ form.region.errors }}
+              {{ form.email.label_tag }}
+              {{ form.email }}
+              {{ form.email.errors }}
             </div>
+
+            <!-- Date of Birth -->
             <div class="col-md-6">
-              {{ form.city.label_tag }}
-              {{ form.city }}
-              {{ form.city.errors }}
+              {{ form.date_of_birth.label_tag }}
+              {{ form.date_of_birth }}
+              {{ form.date_of_birth.errors }}
+            </div>
+
+            <!-- Profile Photo -->
+            <div class="col-md-6">
+              {{ form.profile_photo.label_tag }}
+              {{ form.profile_photo }}
+              {{ form.profile_photo.errors }}
             </div>
 
             <!-- Address -->
-            <div class="col-12">
+            <div class="col-md-6">
               {{ form.address.label_tag }}
               {{ form.address }}
               {{ form.address.errors }}
             </div>
 
-            <!-- Lat / Long -->
-            <div class="col-md-6">
-              {{ form.latitude.label_tag }}
-              {{ form.latitude }}
-              {{ form.latitude.errors }}
-            </div>
-            <div class="col-md-6">
-              {{ form.longitude.label_tag }}
-              {{ form.longitude }}
-              {{ form.longitude.errors }}
-            </div>
-
-            <!-- Status / Featured -->
-            <div class="col-md-6">
-              {{ form.status.label_tag }}
-              {{ form.status }}
-              {{ form.status.errors }}
-            </div>
-            <div class="col-md-6 mt-4">
-              <div class="form-check">
-                {{ form.is_featured }}
-                {{ form.is_featured.label_tag }}
-              </div>
-              {{ form.is_featured.errors }}
-            </div>
-
-            <!-- Amenities -->
-            <div class="col-12 mt-3">
-              <label class="form-label d-block fw-bold">Amenities</label>
-              <div class="form-check form-check-inline">
-                {{ form.has_wifi }}
-                {{ form.has_wifi.label_tag }}
-              </div>
-              <div class="form-check form-check-inline">
-                {{ form.has_pool }}
-                {{ form.has_pool.label_tag }}
-              </div>
-              <div class="form-check form-check-inline">
-                {{ form.has_kitchen }}
-                {{ form.has_kitchen.label_tag }}
-              </div>
-              <div>
-                {{ form.has_wifi.errors }} {{ form.has_pool.errors }} {{ form.has_kitchen.errors }}
-              </div>
-            </div>
-
           </div>
         </div>
 
+        <!-- Modal Footer -->
         <div class="modal-footer">
-          <button type="submit" class="btn btn-primary">Save Property</button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-success">
+            <i class="fas fa-save me-1"></i> Save Changes
+          </button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="fas fa-times me-1"></i> Cancel
+          </button>
         </div>
 
       </form>
@@ -195,337 +392,10 @@
 </div>
 
 
-
-{% if sp_list %}      
-<!-- Saved Property -->
-<div class="shadow">
-    
-    <!-- Property Listing Section -->
-    <section class="py-1 bg-white">
-        <div class="px-4">  
-            <div class=" mb-3">
-                <h2 class="fw-bold"> Saved Property </h2>
-                <p class="text-muted">  Properties  </p>
-            </div>
-            <div class="row g-4">
-                {% for property in sp_list %}
-                <!-- Property Card -->
-                <div class="col-md-4">
-                    <div class="card h-100 shadow">
-                        {% if property.property.primary_image %}
-                        <img src="{{ property.property.primary_image.url }}" class="card-img-top" alt="{{ property.name }}">
-                        {% else %}
-                        <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
-                            <span class="text-white">No Image Available</span>
-                        </div>
-                        {% endif %}
-                        
-                        <div class="card-body">
-              
-                            <div class="text-warning mb-2">
-                                {% with ''|center:5 as range %}
-                                {% for _ in range %}
-                                    {% if forloop.counter <= property.average_rating %}
-                                        <i class="fas fa-star"></i>
-                                    {% else %}
-                                        <i class="far fa-star"></i>
-                                    {% endif %}
-                                {% endfor %}
-                                {% endwith %}
-                                <span class="text-muted">({{ property.review_count }})</span>
-                            </div>
-                            <h5 class="card-title">{{ property.property.name }}</h5>
-
-                            {% if property.property.status == 'AVAILABLE' %}
-
-                                <span class="badge bg-success" >Available</span>
-
-                            {% elif property.property.status == 'BOOKED' %}
-
-                                <span class="badge bg-warning" >Booked</span>
-
-                            {% elif property.property.status == 'RENTED' %}
-
-                                <span class="badge bg-secondary" > Rented </span>
-
-                            {% elif property.property.status == 'MAINTENANCE' %}
-
-                                <span class="badge bg-danger" > Under Maintenance </span>
-
-                            {% endif %}
-
-                            <p class="text-muted">
-                                <i class="fas fa-map-marker-alt"></i> {{ property.property.city.name }}, {{ property.property.region.name }}
-                            </p>
-                            <div class="d-flex flex-wrap gap-2 my-3">
-                                {% if property.property.beds %}
-                                <span class="badge bg-light text-dark">
-                                    <i class="fas fa-bed text-primary"></i> {{ property.property.beds }} beds
-                                </span>
-                                {% endif %}
-
-                                {% if property.property.baths %}
-                                <span class="badge bg-light text-dark">
-                                    <i class="fas fa-bath text-primary"></i> {{ property.property.baths }} baths
-                                </span>
-                                {% endif %}
-
-                                {% if property.property.has_wifi %}
-                                <span class="badge bg-light text-dark">
-                                    <i class="fas fa-wifi text-primary"></i> WiFi
-                                </span>
-                                {% endif %}
-
-                                {% if property.property.has_pool %}
-                                <span class="badge bg-light text-dark">
-                                    <i class="fas fa-swimming-pool text-primary"></i> Pool
-                                </span>
-                                {% endif %}
-
-                                {% if property.property.has_kitchen %}
-                                <span class="badge bg-light text-dark">
-                                    <i class="fas fa-utensils text-primary"></i> Kitchen
-                                </span>
-                                {% endif %}
-
-                                {% if property.property.area_sqft %}
-                                <span class="badge bg-light text-dark">
-                                    <i class="fas fa-ruler-combined text-primary"></i> {{ property.property.area_sqft }} sqft
-                                </span>
-                                {% endif %}
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center mt-3">
-                                <div>
-                                    <span class="fs-5 fw-bold">{{ property.property.rent_amount }} MMK</span>
-                                    <span class="text-muted">/ {{ property.property.rent_type }}</span>
-                                </div>             
-{% if user.is_authenticated %}   
-
-    {% if property.property.id in saved_porperties %}
-
-        
-            {% if sproperty.property.id == property.property.id %}
-
-            <button class="btn btn-danger" > Saved</button>
-
-            {% else %}
-
-            <button class="btn btn-outline-danger"  onclick="saveProperty(event, {{ property.property.id }}, {{ user.id }})"> Save </button>
-
-            {% endif %}
-
-    {% endif %}
-
-{% endif %}
-                            
-    {% if property.property.id in save_property_list %}
-        <!-- Property is saved -->
-
-        {% for saved in saved_porperties %}
-
-        
-
-        {% if saved.user.id == user.id %}
-
-            {% if saved.property.id == property.property.id %}
-                
-                <a href="" class="btn btn-warning" onclick="unSaveProperty(event,{{ saved.id }})" data-property-id="{{ property.property.id }}"> Unsave </a>
-            {% endif %}
-
-        {% endif %}
-        
-        
-
-        {% endfor %}
-
-
-    {% else %}
-        <!-- Property is NOT saved -->
-            {{ save_property_list.id }}
-    
-        <a href="" onclick="saveProperty(event , {{ property.property.id }} , {{ user.id }} )" class="btn btn-outline-warning" data-property-id="{{ property.id }}"> Save </a>
-
-
-    {% endif %}
-
-
-</div>
-        
-                    <a href="{% url 'property_detail' property.property.id %}" class="btn btn-primary w-100 mt-3">
-                        View Details
-                    </a>
-                </div>
-            </div>
-        </div>
-        {% empty %}
-        <div class="col-12 text-center py-5">
-            <h4 class="text-muted">No Saved properties </h4>
-            
-        </div>
-        {% endfor %}
-    </div>
-    
-   
-
-</div>
-</section>
-</div>
-<br>
-<br>
-{% endif %}
-
-
-
-
-
-
-{% comment %}
-<!-- Recent-View-Property -->
-  <br>
- <div class="card">
-  <div class="card-header bg-warning text-white" > Recent View Property </div>
-  <div class="card-body">hello world</div>
- </div>
- {% endcomment %}
-
- 
-<div class="card shadow mb-4">
-  <div class="card-header bg-primary text-white">
-            <h2 class="h5 mb-0">Customer Inquiry Status</h2>
-        </div>
-
-
-  <div class="card-body">
-      <table class="table">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Requester</th>
-      <th>Owner</th>
-      <th>Property</th>
-      <th>Inquiry Status</th>
-      <th>Property Status</th>
-      <th>Action</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for inquiry in customer_inquiry %}
-    <tr>
-      <td> {{ inquiry.id }} </td>
-       <td> {{ inquiry.customer.username }} </td>
-        <td> {{ inquiry.agency_owner.username }} </td>
-         <td> {{ inquiry.property }} </td>
-
-          <td> 
-         
-            {% if inquiry.is_approved %}
-
-              <span class=" badge bg-success" > Approved </span>
-
-            {% else %}
-              
-              <span class="badge bg-warning" > Pending </span>
-
-            {% endif %}
-           </td>
-
-           <td>
-
-            {% if inquiry.property.status == 'AVAILABLE' %}
-
-              <span class="badge bg-success" > Available </span>
-
-              {% elif inquiry.property.status == 'BOOKED' %}
-
-                <span class="badge bg-warning" >Booked</span>
-
-              {% elif inquiry.property.status == 'RENTED' %}
-
-                <span class="badge bg-secondary" >Rented</span>
-
-              {% elif inquiry.property.status == 'MAINTENANCE' %}
-
-                <span class="badge bg-danger" > Under Maintenance </span>
-
-            {% endif %}
-
-            
-           </td>
-
-           <td>
-            <div class="btn-group btn-group-sm">
-            <a href="{% url 'inquiry_detail' inquiry.id %}" class="btn btn-outline-info btn-sm" >Detail</a>
-            <a href="{% url 'cancel_inquiry' inquiry.id %}" class="btn btn-outline-danger btn-sm" >Cancel Inquiry</a>
-
-             {% if inquiry.is_approved %}
-
-              
-              <!-- Payment Button -->
-              <a href="" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#paymentModal">Payment</a>
-
-              <!-- Payment Modal -->
-                <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <form  action="{% url 'payment' inquiry.id %}">
-                        {% csrf_token %}
-                        <div class="modal-header">
-                          <h5 class="modal-title" id="paymentModalLabel">Confirm Payment</h5>
-                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                          Are you sure you want to proceed with the payment?
-                        </div>
-                        <div class="modal-footer">
-                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                          <button type="submit" class="btn btn-warning">Pay Now</button>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-
-
-
-
-
-
-
-            {% else %}
-              
-              <a href="" class="btn btn-outline-warning disabled" >Payment</a>
-
-            {% endif %}
-            
-            
-
-            </div>
-          
-           </td>
-
-    </tr>
-    {% endfor %}
-  </tbody>
- </table>
-  </div>
-</div>
-<br>
-<br>
-  
-  
-
-
-
-
-
-
-
-
-
-
-
-
 <!-- Footer -->
 {% include 'base/footer.html' %}
+
+
+
 
 {% endblock %}

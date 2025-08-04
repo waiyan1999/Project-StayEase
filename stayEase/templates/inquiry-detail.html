@@ -4,33 +4,52 @@
 <div class="container py-5">
     <h2 class="mb-4">Inquiry Details</h2>
 
-    <div class="card shadow-sm border-0">
+    <div class="card shadow border-0 rounded-4">
         <div class="card-body">
-            <h5 class="card-title">From: {{ inquiry.customer.username }}</h5>
-            <h6 class="card-subtitle mb-2 text-muted">To Agency: {{ inquiry.agency_owner.username }}</h6>
-
-            <p><strong>Property:</strong> {{ inquiry.property.name }}</p>
-            <p><strong>Property Status:</strong> {{ inquiry.property.status }}</p>
-
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h5 class="card-title mb-1">
+                        <i class="bi bi-person-circle me-2"></i>
+                        From: <span class="fw-semibold">{{ inquiry.customer.username }}</span>
+                    </h5>
+                    <h6 class="card-subtitle text-muted">To Agency: {{ inquiry.agency_owner.username }}</h6>
+                </div>
+                <div>
+                    {% if inquiry.is_purchased %}
+                        <span class="badge bg-success px-3 py-2 fs-6"> Purchased </span>
+                    {% else %}
+                        <span class="badge bg-secondary px-3 py-2 fs-6">Not Purchased</span>
+                    {% endif %}
+                </div>
+            </div>
             <hr>
-            <p><strong>Message:</strong> {{ inquiry.message }}</p>
-            <p><strong>Created At:</strong> {{ inquiry.created_at|date:"M d, Y - H:i" }}</p>
-            <p><strong>Last Edited:</strong> {{ inquiry.edited_at|date:"M d, Y - H:i" }}</p>
-            <p><strong>Is Replied:</strong> 
-                {% if inquiry.is_replied %}
-                    <span class="badge bg-success">Yes</span>
-                {% else %}
-                    <span class="badge bg-secondary">No</span>
-                {% endif %}
-            </p>
-            <p><strong>Is Approved:</strong> 
-                {% if inquiry.is_approved %}
-                    <span class="badge bg-success">Approved</span>
-                {% else %}
-                    <span class="badge bg-warning">Pending</span>
-                {% endif %}
-            </p>
-
+            <div class="row mb-2">
+                <div class="col-md-6">
+                    <p class="mb-1"><strong>Property:</strong> {{ inquiry.property.name }}</p>
+                    <p class="mb-1"><strong>Status:</strong> 
+                        <span class="badge {% if inquiry.property.status == 'AVAILABLE' %}bg-success{% else %}bg-warning{% endif %}">
+                            {{ inquiry.property.status }}
+                        </span>
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <p class="mb-1"><strong>Created At:</strong> {{ inquiry.created_at|date:"M d, Y - H:i" }}</p>
+                    <p class="mb-1"><strong>Last Edited:</strong> {{ inquiry.edited_at|date:"M d, Y - H:i" }}</p>
+                </div>
+            </div>
+            <hr>
+            <p class="mb-3"><strong>Message:</strong> {{ inquiry.message }}</p>
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-1"><strong>Is Approved:</strong>
+                        {% if inquiry.is_approved %}
+                            <span class="badge bg-success">Approved</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">Pending</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
             {% if request.user == inquiry.agency_owner and not inquiry.is_approved %}
                 <form method="post" action="{% url 'approve_inquiry' inquiry.id %}">
                     {% csrf_token %}

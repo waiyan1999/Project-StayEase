@@ -64,7 +64,7 @@ def index(request):
                 property_type_value = request.POST.get('property_type')
 
                 # Start with all properties
-                search_properties = Property.objects.all()
+                search_properties = Property.objects.filter(admin_approved ='APPROVED',status__in=['AVAILABLE', 'BOOKED'])
                 region_obj = None
                 township_obj = None
 
@@ -86,16 +86,21 @@ def index(request):
                 save_property = SaveProperty.objects.filter(user=request.user.id)
                 save_property_list = SaveProperty.objects.filter(user=request.user).values_list('property_id', flat=True)
                 featured_properties = Property.objects.filter(is_featured=True,admin_approved ='APPROVED' )
-                yangon_properties = Property.objects.filter(region = 1)
-                mandalay_properties = Property.objects.filter(region = 2)    
+                yangon_properties = Property.objects.filter(
+                region=1,
+                status__in=['AVAILABLE', 'BOOKED'],
+                admin_approved='APPROVED'
+            )
+
+                mandalay_properties = Property.objects.filter(region = 2,admin_approved ='APPROVED')    
 
                 context = {
                     'search_properties': search_properties,
                     'region': region_obj,
                     'township': township_obj,
                     'property_type': property_type_value,
-                    'regions': regions,  # Maintain form options
-                    'cities': cities,    # Maintain form options,
+                    'regions': regions,  
+                    'cities': cities,   
                     
                     'featured_properties': featured_properties,
                     'regions': regions,
@@ -112,9 +117,9 @@ def index(request):
             saved_porperties = SaveProperty.objects.filter(user = request.user)
             save_property = SaveProperty.objects.filter(user=request.user.id)
             save_property_list = SaveProperty.objects.filter(user=request.user).values_list('property_id', flat=True)
-            featured_properties = Property.objects.filter(is_featured=True,admin_approved ='APPROVED' )
-            yangon_properties = Property.objects.filter(region = 1)
-            mandalay_properties = Property.objects.filter(region = 2)
+            featured_properties = Property.objects.filter(is_featured=True,admin_approved ='APPROVED',status__in=['AVAILABLE', 'BOOKED'] )
+            yangon_properties = Property.objects.filter(region = 1,admin_approved ='APPROVED',status__in=['AVAILABLE', 'BOOKED'])
+            mandalay_properties = Property.objects.filter(region = 2,admin_approved ='APPROVED',status__in=['AVAILABLE', 'BOOKED'])
             context = {
                 'featured_properties': featured_properties,
                 'regions': regions,
@@ -189,14 +194,21 @@ def admin_dashboard(request):
     cityForm = CityForm()
     regions = Region.objects.all()
     cities = City.objects.all()
+    
     customer_user = CustomUser.objects.filter(role = 'CUSTOMER')
+    customer_user_count = customer_user.count()
+    
     agencies = CustomUser.objects.filter( role = "AGENCY")
     properties = Property.objects.all()
     reviews = Review.objects.all()
     
+    user_inquiry = Inquiry.objects.filter(customer__username='kyawkyaw')
+    user_inquiry_count = user_inquiry.count()
+    
+    print(customer_user_count)
     
     context = {
-        'total_users': total_users-agencies_registered-1,
+        'total_users': total_users-agencies_registered,
         'properties_listed': properties_listed,
         'agencies_registered': agencies_registered,
         'average_rating': round(average_rating, 1),
@@ -215,7 +227,9 @@ def admin_dashboard(request):
         'reviews': reviews,
         'active_listed':active_listed,
         'pending_properties_count':pending_properties_count,
-        'reject_properties_count':reject_properties_count
+        'reject_properties_count':reject_properties_count,
+        'user_inquiry_count':user_inquiry_count,
+        'customer_user_count':customer_user_count,
     }
     
     if request.method == 'POST':
@@ -243,7 +257,7 @@ class PropertyView(View):
     def get(self, request):
         propertyForm = PropertyForm()
         cities = City.objects.all()
-        properties = Property.objects.filter(is_active=True ,admin_approved = 'APPROVED')
+        properties = Property.objects.filter(is_active=True ,admin_approved = 'APPROVED',status__in=['AVAILABLE', 'BOOKED'])
         saved_porperties = SaveProperty.objects.filter(user = request.user)
         save_property = SaveProperty.objects.filter(user=request.user.id)
         save_property_list = SaveProperty.objects.filter(user=request.user).values_list('property_id', flat=True)
@@ -447,7 +461,7 @@ def register_user(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
-            user = form.save()  # ✅ This will hash the password correctly
+            user = form.save()  
             login(request,user)
             return redirect('index')
     else:
@@ -456,77 +470,77 @@ def register_user(request):
 
 
     
-class ProfileView(View):
-    def get_profile_context(self, user):
-        profile = None
-        form = None
-        profile_type = None
-        return profile, form, profile_type
+from django.views import View
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from myapp.models import SaveProperty, Inquiry, Property, CustomerProfile
+from myapp.form import CustomerProfileForm
 
+class ProfileView(View):
     def get(self, request):
         if not request.user.is_authenticated:
             messages.warning(request, 'Please login to view your profile')
             return redirect('login')
-        
-        inquiry_list = Inquiry.objects.filter(agency_owner=request.user)
-        customer_inquiry = Inquiry.objects.filter(customer = request.user)
-    
+
+        # Get profile form for current customer
+        customer_profile, _ = CustomerProfile.objects.get_or_create(user=request.user)
+        form = CustomerProfileForm(instance=customer_profile)
+
+        # Data for saved properties & inquiries
         sp_list = SaveProperty.objects.filter(user=request.user)
-        featured_properties = Property.objects.filter(is_featured=True,admin_approved ='APPROVED' )
-
-        profile, form, profile_type = self.get_profile_context(request.user)
-
-        saved_porperties = SaveProperty.objects.filter(user = request.user)
-        save_property = SaveProperty.objects.filter(user=request.user.id)
+        customer_inquiry = Inquiry.objects.filter(customer=request.user)
         save_property_list = SaveProperty.objects.filter(user=request.user).values_list('property_id', flat=True)
-       
+        saved_porperties = SaveProperty.objects.filter(user = request.user)
         
+        rented_inquiries = Inquiry.objects.filter(
+        customer=request.user,
+        is_approved=True,
+        is_purchased=True,
+        property__status='RENTED'
+    ).select_related('property')
+
+
         return render(request, 'profile.html', {
             'form': form,
-            'profile': profile,
-            'profile_type': profile_type,
-            'user_role': request.user.get_role_display(),
-            'sp_list':sp_list,
-            'inquiry_list': inquiry_list,
-            'customer_inquiry':customer_inquiry,
+            'sp_list': sp_list,
+            'customer_inquiry': customer_inquiry,
+            'save_property_list':save_property_list,
             'saved_porperties':saved_porperties,
-            'save_property':save_property,
-            'save_property_list':save_property_list
-            
-            
-            
+            'rented_inquiries':rented_inquiries
         })
 
     def post(self, request):
         if not request.user.is_authenticated:
             return redirect('login')
 
-        profile, _, profile_type = self.get_profile_context(request.user)
+        customer_profile, _ = CustomerProfile.objects.get_or_create(user=request.user)
+        form = CustomerProfileForm(request.POST, request.FILES, instance=customer_profile)
 
-        if not profile:
-            messages.error(request, "Profile update not available for your role")
-            return redirect('profile')
-
-        # Determine the correct form class
-        form_class_map = {
-            'customer': CustomerProfileForm,
-            'agency': AgencyProfileForm,
-            'owner': OwnerProfileForm
-        }
-        form_class = form_class_map.get(profile_type)
-
-        form = form_class(request.POST, request.FILES, instance=profile)
         if form.is_valid():
             form.save()
             messages.success(request, "Profile updated successfully!")
             return redirect('profile')
 
+        # Reload with errors if invalid
+        sp_list = SaveProperty.objects.filter(user=request.user)
+        customer_inquiry = Inquiry.objects.filter(customer=request.user)
+        
+        rented_inquiries = Inquiry.objects.filter(
+        customer=request.user,
+        is_approved=True,
+        is_purchased=True,
+        property__status='RENTED'
+    ).select_related('property')
+
         return render(request, 'profile.html', {
             'form': form,
-            'profile': profile,
-            'profile_type': profile_type,
-            'user_role': request.user.get_role_display(),
+            'sp_list': sp_list,
+            'customer_inquiry': customer_inquiry,
+            'save_property_list':save_property_list,
+            'saved_porperties':saved_porperties,
+            'rented_inquiries':rented_inquiries
         })
+
         
 
 
@@ -660,6 +674,8 @@ def inquiryDetail(request, pk):
 def payment(request, pk):  # `pk` is the Inquiry ID
     # Step 1: Get the Inquiry
     inquiry = get_object_or_404(Inquiry, id=pk)
+    inquiry.is_purchased = True
+    inquiry.save()
 
     # Step 2: Check permission
     if request.user != inquiry.customer:
@@ -673,6 +689,7 @@ def payment(request, pk):  # `pk` is the Inquiry ID
     property_obj = inquiry.property
     property_obj.status = 'RENTED'
     property_obj.save()
+    
 
     messages.success(request, f"Payment successful! Property '{property_obj.name}' is now rented.")
     print("Payment successful! Property status updated to RENTED.")
@@ -684,16 +701,130 @@ def payment(request, pk):  # `pk` is the Inquiry ID
 
 
 
-@login_required
-def agencyDashboard(request):
+# @login_required
+# def agencyDashboard(request):
+#     # Verify user role
+#     if request.user.role != 'AGENCY':
+#         return redirect('index')
+    
+#     # Handle all POST requests (create, update, delete)
+#     if request.method == 'POST':
+#         # Property creation
+#         if 'create_property' in request.POST:
+#             propertyForm = PropertyForm(request.POST, request.FILES)
+#             if propertyForm.is_valid():
+#                 property = propertyForm.save(commit=False)
+#                 property.posted_by = request.user
+#                 property.save()
+#                 messages.success(request, f"Successfully created new property: {property.name}")
+#             else:
+#                 messages.error(request, "Error occurred while creating new property.")
+#             return redirect('agency_dashboard')
+        
+#         # Property update
+#         elif 'update_property' in request.POST:
+#             property_id = request.POST.get('property_id')
+#             property = get_object_or_404(Property, id=property_id, posted_by=request.user)
+#             propertyForm = PropertyForm(request.POST, request.FILES, instance=property)
+#             if propertyForm.is_valid():
+#                 propertyForm.save()
+#                 messages.success(request, f"Successfully updated property: {property.name}")
+#             else:
+#                 messages.error(request, "Error occurred while updating property.")
+#             return redirect('agency_dashboard')
+        
+#         # Property deletion
+#         elif 'delete_property' in request.POST:
+#             property_id = request.POST.get('property_id')
+#             property = get_object_or_404(Property, id=property_id, posted_by=request.user)
+#             property_name = property.name
+#             property.delete()
+#             messages.success(request, f"Successfully deleted property: {property_name}")
+#             return redirect('agency_dashboard')
+    
+#     # Prepare dashboard data - CORRECTED INDENTATION
+#     properties = Property.objects.filter(posted_by=request.user).order_by('-created_at')
+    
+#     # Attach edit form to each property instance
+#     for property in properties:
+#         property.edit_form = PropertyForm(instance=property)
+    
+#     inquiries = Inquiry.objects.filter(agency_owner=request.user).order_by('-created_at')
+#     reviews = Review.objects.filter(property__posted_by=request.user).order_by('-created_at')
+    
+#     # Prepare recent activities
+#     recent_activities = []
+    
+#     # Add recent properties
+#     recent_activities.extend({
+#         'date': prop.created_at,
+#         'type': 'Property Added',
+#         'property': prop.name,
+#         'status': prop.get_status_display(),
+#         'status_color': 'success' if prop.status == 'AVAILABLE' else 'warning'
+#     } for prop in properties[:3])
+    
+#     # Add recent inquiries
+#     recent_activities.extend({
+#         'date': inquiry.created_at,
+#         'type': 'New Inquiry',
+#         'property': inquiry.property.name,
+#         'status': 'Pending' if not inquiry.is_approved else 'Approved',
+#         'status_color': 'warning' if not inquiry.is_approved else 'success'
+#     } for inquiry in inquiries[:3])
+    
+#     # Sort activities by date (newest first)
+#     recent_activities.sort(key=lambda x: x['date'], reverse=True)
+    
+#     # Create form instance for new property
+#     propertyForm = PropertyForm()
+    
+#     context = {
+#         'agency_profile': getattr(request.user, 'agency_profile', None),
+#         'properties': properties,
+#         'properties_count': properties.count(),
+#         'approved_properties_count': properties.filter(admin_approved='APPROVED').count(),
+#         'pending_properties_count':Property.objects.filter(posted_by=request.user,admin_approved='PENDING').count(),
+#         'inquiry_list': Inquiry.objects.filter(agency_owner=request.user),
+#         'new_inquiries_count': inquiries.filter(is_approved=False).count(),
+#         'property_reviews': reviews,
+#         'pending_reviews_count': reviews.filter(is_approved=False).count(),
+#         'recent_activities': recent_activities[:5],
+#         'form': propertyForm
+#     }
+    
+#     return render(request, 'agency-dashboard.html', context)        
+
+
+# from myapp.form import PropertyForm, AgencyProfileForm
+# from django.contrib import messages
+# from django.shortcuts import render, redirect, get_object_or_404
+# from django.contrib.auth.decorators import login_required
+
+# @login_required
+# def agencyDashboard(request):
     # Verify user role
     if request.user.role != 'AGENCY':
         return redirect('index')
     
-    # Handle all POST requests (create, update, delete)
+    # Get or create agency profile
+    agency_profile = getattr(request.user, 'agency_profile', None)
+    profile_form = AgencyProfileForm(instance=agency_profile)
+    
+    # Handle POST requests (property or profile)
     if request.method == 'POST':
+        # Handle agency profile update
+        if 'edit_profile' in request.POST:
+            profile_form = AgencyProfileForm(request.POST, request.FILES, instance=agency_profile)
+            if profile_form.is_valid():
+                profile_form.save()
+                messages.success(request, "Profile updated successfully!")
+            else:
+                messages.error(request, "There was an error updating your profile.")
+            return redirect('agency_dashboard')
+        
         # Property creation
-        if 'create_property' in request.POST:
+        elif 'create_property' in request.POST:
             propertyForm = PropertyForm(request.POST, request.FILES)
             if propertyForm.is_valid():
                 property = propertyForm.save(commit=False)
@@ -725,20 +856,16 @@ def agencyDashboard(request):
             messages.success(request, f"Successfully deleted property: {property_name}")
             return redirect('agency_dashboard')
     
-    # Prepare dashboard data - CORRECTED INDENTATION
+    # Prepare dashboard data
     properties = Property.objects.filter(posted_by=request.user).order_by('-created_at')
-    
-    # Attach edit form to each property instance
     for property in properties:
         property.edit_form = PropertyForm(instance=property)
     
     inquiries = Inquiry.objects.filter(agency_owner=request.user).order_by('-created_at')
     reviews = Review.objects.filter(property__posted_by=request.user).order_by('-created_at')
     
-    # Prepare recent activities
+    # Recent activities
     recent_activities = []
-    
-    # Add recent properties
     recent_activities.extend({
         'date': prop.created_at,
         'type': 'Property Added',
@@ -746,8 +873,6 @@ def agencyDashboard(request):
         'status': prop.get_status_display(),
         'status_color': 'success' if prop.status == 'AVAILABLE' else 'warning'
     } for prop in properties[:3])
-    
-    # Add recent inquiries
     recent_activities.extend({
         'date': inquiry.created_at,
         'type': 'New Inquiry',
@@ -755,30 +880,147 @@ def agencyDashboard(request):
         'status': 'Pending' if not inquiry.is_approved else 'Approved',
         'status_color': 'warning' if not inquiry.is_approved else 'success'
     } for inquiry in inquiries[:3])
-    
-    # Sort activities by date (newest first)
     recent_activities.sort(key=lambda x: x['date'], reverse=True)
     
-    # Create form instance for new property
     propertyForm = PropertyForm()
     
     context = {
-        'agency_profile': getattr(request.user, 'agency_profile', None),
+        'agency_profile': agency_profile,
+        'profile_form': profile_form,  # Include this in context
         'properties': properties,
         'properties_count': properties.count(),
-        'active_properties_count': properties.filter(status='AVAILABLE').count(),
-        'inquiry_list': inquiries,
-        'new_inquiries_count': inquiries.filter(is_approved=False).count(),
+        'approved_properties_count': properties.filter(admin_approved='APPROVED').count(),
+        'pending_properties_count': Property.objects.filter(posted_by=request.user, admin_approved='PENDING').count(),
+        'inquiry_list': Inquiry.objects.filter(agency_owner=request.user),
+        'inquiries_count': Inquiry.objects.filter(agency_owner=request.user,is_replied=False).count(),
         'property_reviews': reviews,
         'pending_reviews_count': reviews.filter(is_approved=False).count(),
         'recent_activities': recent_activities[:5],
         'form': propertyForm
     }
     
-    return render(request, 'agency-dashboard.html', context)        
+    return render(request, 'agency-dashboard.html', context)
 
 
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
+from .models import AgencyProfile, Property, Inquiry, Review
+from myapp.form import AgencyProfileForm, PropertyForm
+
+@login_required
+def agencyDashboard(request):
+    if request.user.role != 'AGENCY':
+        return redirect('index')
+    
+    # Get agency profile or None
+    try:
+        agency_profile = request.user.agency_profile
+        has_profile = True
+    except AgencyProfile.DoesNotExist:
+        agency_profile = None
+        has_profile = False
+
+    # Use profile form for create or edit
+    if agency_profile:
+        profile_form = AgencyProfileForm(instance=agency_profile)
+    else:
+        profile_form = AgencyProfileForm()
+
+    if request.method == 'POST':
+        # Profile create or update
+        if 'edit_profile' in request.POST or 'create_profile' in request.POST:
+            if agency_profile:
+                profile_form = AgencyProfileForm(request.POST, request.FILES, instance=agency_profile)
+            else:
+                profile_form = AgencyProfileForm(request.POST, request.FILES)
+            if profile_form.is_valid():
+                profile = profile_form.save(commit=False)
+                profile.user = request.user
+                profile.save()
+                messages.success(request, "Profile saved successfully!")
+            else:
+                messages.error(request, "There was an error saving your profile.")
+            return redirect('agency_dashboard')
+        
+        # Property create
+        elif 'create_property' in request.POST:
+            propertyForm = PropertyForm(request.POST, request.FILES)
+            if propertyForm.is_valid():
+                property = propertyForm.save(commit=False)
+                property.posted_by = request.user
+                property.save()
+                messages.success(request, f"Successfully created new property: {property.name}")
+            else:
+                messages.error(request, "Error occurred while creating new property.")
+            return redirect('agency_dashboard')
+        
+        # Property update
+        elif 'update_property' in request.POST:
+            property_id = request.POST.get('property_id')
+            property = get_object_or_404(Property, id=property_id, posted_by=request.user)
+            propertyForm = PropertyForm(request.POST, request.FILES, instance=property)
+            if propertyForm.is_valid():
+                propertyForm.save()
+                messages.success(request, f"Successfully updated property: {property.name}")
+            else:
+                messages.error(request, "Error occurred while updating property.")
+            return redirect('agency_dashboard')
+        
+        # Property deletion
+        elif 'delete_property' in request.POST:
+            property_id = request.POST.get('property_id')
+            property = get_object_or_404(Property, id=property_id, posted_by=request.user)
+            property_name = property.name
+            property.delete()
+            messages.success(request, f"Successfully deleted property: {property_name}")
+            return redirect('agency_dashboard')
+    
+    # Prepare dashboard data
+    properties = Property.objects.filter(posted_by=request.user).order_by('-created_at')
+    for property in properties:
+        property.edit_form = PropertyForm(instance=property)
+    
+    inquiries = Inquiry.objects.filter(agency_owner=request.user).order_by('-created_at')
+    reviews = Review.objects.filter(property__posted_by=request.user).order_by('-created_at')
+    
+    # Recent activities (as in your original)
+    recent_activities = []
+    recent_activities.extend({
+        'date': prop.created_at,
+        'type': 'Property Added',
+        'property': prop.name,
+        'status': prop.get_status_display(),
+        'status_color': 'success' if prop.status == 'AVAILABLE' else 'warning'
+    } for prop in properties[:3])
+    recent_activities.extend({
+        'date': inquiry.created_at,
+        'type': 'New Inquiry',
+        'property': inquiry.property.name,
+        'status': 'Pending' if not inquiry.is_approved else 'Approved',
+        'status_color': 'warning' if not inquiry.is_approved else 'success'
+    } for inquiry in inquiries[:3])
+    recent_activities.sort(key=lambda x: x['date'], reverse=True)
+    
+    propertyForm = PropertyForm()
+    
+    context = {
+        'agency_profile': agency_profile,
+        'profile_form': profile_form,
+        'has_profile': has_profile,
+        'properties': properties,
+        'properties_count': properties.count(),
+        'approved_properties_count': properties.filter(admin_approved='APPROVED').count(),
+        'pending_properties_count': Property.objects.filter(posted_by=request.user, admin_approved='PENDING').count(),
+        'inquiry_list': Inquiry.objects.filter(agency_owner=request.user),
+        'inquiries_count': Inquiry.objects.filter(agency_owner=request.user,is_purchased=False).count(),
+        'property_reviews': reviews,
+        'pending_reviews_count': reviews.filter(is_approved=False).count(),
+        'recent_activities': recent_activities[:5],
+        'form': propertyForm
+    }
+    return render(request, 'agency-dashboard.html', context)
 
 
 
@@ -813,9 +1055,9 @@ def send_message_view(request):
             sender_message=message
         )
         messages.success(request, "Your message has been sent successfully!")
-        #return redirect('send_message')  # Replace with your desired redirect URL name
+       
 
-    return redirect('contact') # Replace with your actual template
+    return redirect('contact') 
 
 
 

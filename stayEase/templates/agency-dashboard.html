@@ -3,26 +3,26 @@
 {% block title %}{{ user.username }} - Agency Dashboard{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4">
-    <div class="row">
-        <!-- Sidebar Navigation -->
-        <div class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-            <div class="position-sticky pt-3">
+<div class="container-fluid px-0">
+    <div class="row g-0">
+
+        <!-- Sidebar -->
+        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-primary-subtle sidebar collapse shadow-sm">
+            <div class="position-sticky pt-4" style="top: 20px;">
                 <div class="text-center mb-4">
                     {% if user.agency_profile.agency_logo %}
-                        <img src="{{ user.agency_profile.agency_logo.url }}" class="rounded-circle" width="100" height="100" alt="Agency Logo">
+                        <img src="{{ user.agency_profile.agency_logo.url }}" class="rounded-circle border shadow-sm" width="80" height="80" alt="Agency Logo">
                     {% else %}
-                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center shadow-sm" style="width: 80px; height: 80px;">
                             <span class="text-white">No Logo</span>
                         </div>
                     {% endif %}
-                    <h5 class="mt-3">{{ user.agency_profile.agency_name }}</h5>
-                    <p class="text-muted small">{{ user.email }}</p>
+                    <div class="mt-2 fw-bold">{{ user.agency_profile.agency_name }}</div>
+                    <div class="text-muted small">{{ user.email }}</div>
                 </div>
-                
-                <ul class="nav flex-column">
+                <ul class="nav flex-column gap-1">
                     <li class="nav-item">
-                        <a class="nav-link active" href="#dashboard-section">
+                        <a class="nav-link" href="#dashboard-section">
                             <i class="fas fa-tachometer-alt me-2"></i> Dashboard
                         </a>
                     </li>
@@ -42,82 +42,76 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'agency_setting' %}">
-                            <i class="fas fa-cog me-2"></i> Settings
+                        <a class="nav-link" href="#profile">
+                            <i class="fas fa-cog me-2"></i> Profile
+                        </a>
+                    </li>
+                    <li class="nav-item border-top pt-2 mt-2">
+                        <a class="nav-link text-danger" href="{% url 'logout_user' %}">
+                            <i class="fas fa-sign-out-alt me-2"></i> Logout
                         </a>
                     </li>
                 </ul>
             </div>
-        </div>
+        </nav>
 
         <!-- Main Content -->
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+
+            {% comment %}
+            <!-- Sidebar toggle for mobile -->
+            <button class="btn btn-outline-primary d-md-none mb-3" type="button"
+                data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu">
+                <i class="fas fa-bars"></i> Menu
+            </button>
+            {% endcomment %}
+
             <!-- Dashboard Overview -->
-            <div id="dashboard-section" class="py-4">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">Dashboard Overview</h1>
-                    <div class="btn-toolbar mb-2 mb-md-0">
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#propertyModal">
-                            <i class="fas fa-plus me-2"></i>Add Property
-                        </button>
+            <section id="dashboard-section" class="mb-5">
+                <div class="d-flex justify-content-between align-items-center pb-2 mb-3 border-bottom">
+                    <h1 class="h3 fw-bold">Agency Dashboard Overview</h1>
+                </div>
+                <div class="row mb-4 g-3">
+                    <div class="col-6 col-md-3">
+                        <div class="card text-white bg-primary h-100">
+                            <div class="card-body">
+                                <h6 class="card-title">Total Properties</h6>
+                                <div class="display-6">{{ properties_count }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card text-white bg-success h-100">
+                            <div class="card-body">
+                                <h6 class="card-title">Approved Listings</h6>
+                                <div class="display-6">{{ approved_properties_count }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card text-white bg-warning h-100">
+                            <div class="card-body">
+                                <h6 class="card-title">Pending Listings</h6>
+                                <div class="display-6">{{ pending_properties_count }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card text-white bg-info h-100">
+                            <div class="card-body">
+                                <h6 class="card-title">Inquiries</h6>
+                                <div class="display-6">{{ inquiries_count }}</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <!-- Stats Cards -->
-                <div class="row mb-4">
-                    <div class="col-md-3">
-                        <div class="card text-white bg-primary mb-3">
-                            <div class="card-body">
-                                <h5 class="card-title">Total Properties</h5>
-                                <h2 class="card-text">{{ properties_count }}</h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card text-white bg-success mb-3">
-                            <div class="card-body">
-                                <h5 class="card-title">Active Listings</h5>
-                                <h2 class="card-text">{{ active_properties_count }}</h2>
-                            </div>
-                        </div>
-                    </div>
-                     <div class="col-md-3">
-                        <div class="card text-white bg-warning mb-3">
-                            <div class="card-body">
-                                <h5 class="card-title">Pending Listings</h5>
-                                <h2 class="card-text">{{ active_properties_count }}</h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card text-white bg-info mb-3">
-                            <div class="card-body">
-                                <h5 class="card-title">Inquiries</h5>
-                                <h2 class="card-text">{{ new_inquiries_count }}</h2>
-                            </div>
-                        </div>
-                    </div>
-                    {% comment %}
-                    <div class="col-md-3">
-                        <div class="card text-white bg-warning mb-3">
-                            <div class="card-body">
-                                <h5 class="card-title">Pending Reviews</h5>
-                                <h2 class="card-text">{{ pending_reviews_count }}</h2>
-                            </div>
-                        </div>
-                    </div>
-                    {% endcomment %}
-
-                </div>
-
-                <!-- Recent Activity -->
-                <div class="card shadow">
+                <div class="card shadow-sm">
                     <div class="card-header bg-light">
                         <h5 class="mb-0">Recent Activity</h5>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body p-0">
                         <div class="table-responsive">
-                            <table class="table table-hover">
+                            <table class="table table-hover mb-0">
                                 <thead>
                                     <tr>
                                         <th>Date</th>
@@ -138,47 +132,33 @@
                                             </span>
                                         </td>
                                     </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-center py-3">No recent activity.</td>
+                                    </tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
 
-    
-
-            <!-- Properties Section -->
-            <div id="properties-section" class="py-4">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">Property Management</h1>
-                    <div class="btn-toolbar mb-2 mb-md-0">
-                        <div class="btn-group me-2">
-                            <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
-                        </div>
-                        <!-- Add Property Button -->
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#propertyModal">
-                            <i class="fas fa-plus-circle me-2"></i> Add New Property
-                        </button>
-                    </div>
+            <!-- Properties Management -->
+            <section id="properties-section" class="mb-5">
+                <div class="d-flex justify-content-between align-items-center pb-2 mb-3 border-bottom">
+                    <h2 class="h4 fw-bold">Property Management </h2>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#propertyModal">
+                        <i class="fas fa-plus-circle me-2"></i> Add New Property
+                    </button>
                 </div>
-
-                <!-- Property List -->
-                <div class="card shadow">
-                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Your Properties</h5>
-                        <div>
-                            <select class="form-select form-select-sm" style="width: auto;">
-                                <option>All Status </option>
-                                <option>Available</option>
-                                <option>Booked</option>
-                                <option>Rented</option>
-                            </select>
-                        </div>
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0">Property List <span class="badge bg-primary">Listed {{properties_count}} </span></h6>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body p-0">
                         <div class="table-responsive">
-                            <table class="table table-hover">
+                            <table class="table table-hover mb-0">
                                 <thead>
                                     <tr>
                                         <th>ID</th>
@@ -194,12 +174,35 @@
                                 <tbody>
                                     {% for property in properties %}
                                     <tr>
-
                                         <td>{{ property.id }}</td>
                                         <td>
                                             <a href="{% url 'property_detail' property.id %}">{{ property.name }}</a>
                                         </td>
-                                        <td>{{ property.get_property_type_display }}</td>
+
+
+                                        <td>
+                                           
+
+                                            {% if property.property_type  == 'HOUSE' %}
+
+                                            <span class="badge bg-primary" >House</span>
+
+                                            {% elif property.property_type  == 'APARTMENT' %}
+
+                                            <span class="badge bg-success"> Apartment </span>
+
+                                            {% elif property.property_type  == 'CONDO' %}
+
+                                            <span class="badge bg-warning" > Condo </span>
+
+                                            {% elif property.property_type  == 'HOSTEL' %}
+
+                                            <span class="badge bg-secondary" > Hostel </span>
+
+                                            {% endif %}
+                                        </td>
+
+
                                         <td>{{ property.city.name }}, {{ property.region.name }}</td>
                                         <td>
                                             <span class="badge 
@@ -208,143 +211,50 @@
                                                 {% elif property.status == 'RENTED' %}bg-primary
                                                 {% else %}bg-secondary{% endif %}">
                                                 {{ property.get_status_display }}
-                                            
+                                            </span>
                                         </td>
                                         <td>
-
-                                            </span>
-                                            {% if property.admin_approved == 'PENDING' %}
-                                            <span class="badge bg-info text-dark">Pending Approval</span>
+                                            {% if property.admin_approved == 'APPROVED' %}
+                                                <span class="badge bg-info">Approved</span>
+                                            {% elif property.admin_approved == 'PENDING' %}
+                                                <span class="badge bg-warning text-dark">Pending</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Rejected</span>
                                             {% endif %}
-
                                         </td>
                                         <td>{{ property.rent_amount }} MMK / {{ property.get_rent_type_display }}</td>
                                         <td>
-                                    
-<div class="btn-group ">
-
-
-<!-- Inside .property-item -->
-<button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editModal{{ property.id }}">
-  Edit ggg
-</button>
-
-
-<div>
-    <!-- Delete Form -->
-<form method="post">
-    {% csrf_token %}
-    <input type="hidden" name="property_id" value="{{ property.id }}">
-    <button type="submit" name="delete_property" class="btn btn-outline-danger" 
-            onclick="return confirm('Are you sure you want to delete this property?')">
-        Delete
-    </button>
-</form>
-
-</div>
-
-
-
-</div>
-
+                                            <div class="btn-group btn-group-sm">
+                                                <button type="button" class="btn btn-outline-warning btn-sm"
+                                                    data-bs-toggle="modal" data-bs-target="#editModal{{ property.id }}"><i class="fa fa-edit"></i></button>
+                                                <button class="btn btn-outline-danger btn-sm" onclick="deleteProperty(event,{{property.id}})"><i class="fas fa-trash"></i></button>
+                                            </div>
                                         </td>
                                     </tr>
-
- 
-
-
-
-    {% empty %}
-    <tr>
-        <td colspan="7" class="text-center py-4">No properties found. <a href="#" data-bs-toggle="modal" data-bs-target="#propertyModal">Add your first property</a></td>
-    </tr>
-
-
-
-
-
-
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-
-
-
-
-
-
-                        
-                        {% if properties %}
-                        <nav aria-label="Page navigation">
-                            <ul class="pagination justify-content-center">
-                                {% if properties.has_previous %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page=1">&laquo; First</a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ properties.previous_page_number }}">Previous</a>
-                                </li>
-                                {% endif %}
-                                
-                                <li class="page-item disabled">
-                                    <span class="page-link">
-                                        Page {{ properties.number }} of {{ properties.paginator.num_pages }}
-                                    </span>
-                                </li>
-                                
-                                {% if properties.has_next %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ properties.next_page_number }}">Next</a>
-                                </li>
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ properties.paginator.num_pages }}">Last &raquo;</a>
-                                </li>
-                                {% endif %}
-                            </ul>
-                        </nav>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-
-
-
-
-
-
-
-
-
-
-
-            <!-- Inquiries Section -->
-            <div id="inquiries-section" class="py-4">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">Inquiry Management</h1>
-                    <div class="btn-toolbar mb-2 mb-md-0">
-                        <div class="btn-group me-2">
-                            <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="8" class="text-center py-4">No properties found.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
+            </section>
 
-                <div class="card shadow">
-                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Property Inquiries</h5>
-                        <div>
-                            <select class="form-select form-select-sm" style="width: auto;">
-                                <option>All Status</option>
-                                <option>Pending</option>
-                                <option>Approved</option>
-                                <option>Rejected</option>
-                            </select>
-                        </div>
+            <!-- Inquiries Management -->
+            <section id="inquiries-section" class="mb-5">
+                <div class="d-flex justify-content-between align-items-center pb-2 mb-3 border-bottom">
+                    <h2 class="h4 fw-bold">Inquiry Management</h2>
+                </div>
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0">Inquiry</h6>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body p-0">
                         <div class="table-responsive">
-                            <table class="table table-hover">
+                            <table class="table table-hover mb-0">
                                 <thead>
                                     <tr>
                                         <th>ID</th>
@@ -353,6 +263,7 @@
                                         <th>Date</th>
                                         <th>Status</th>
                                         <th>Actions</th>
+                                        <th>Payment Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -360,9 +271,7 @@
                                     <tr>
                                         <td>{{ inquiry.id }}</td>
                                         <td>
-                                            <a href="{% url 'property_detail' inquiry.property.id %}">
-                                                {{ inquiry.property.name }}
-                                            </a>
+                                            <a href="{% url 'property_detail' inquiry.property.id %}">{{ inquiry.property.name }}</a>
                                         </td>
                                         <td>{{ inquiry.customer.username }}</td>
                                         <td>{{ inquiry.created_at|date:"M d, Y" }}</td>
@@ -373,13 +282,113 @@
                                                 <span class="badge bg-warning text-dark">Pending</span>
                                             {% endif %}
                                         </td>
+
                                         <td>
                                             <div class="btn-group btn-group-sm">
-                                                <a href="{% url 'inquiry_detail' inquiry.id %}" class="btn btn-outline-info">Details</a>
-                                                <a href="{% url 'approve_inquiry' inquiry.id %}" class="btn btn-outline-success">Approve</a>
-                                                <a href="{% url 'reject_inquiry' inquiry.id %}" class="btn btn-outline-danger">Reject</a>
+                                                <a href="{% url 'inquiry_detail' inquiry.id %}" class="btn btn-outline-info">Details <i class="fas fa-eye"></i></a>
+                                                <a href="" onclick="approveInquiry(event,{{ inquiry.id }})" class="btn btn-outline-success"> Approve <i class="fas fa-check text-success"></i></i></a>
+                                                
+                                                <a href="" class="btn btn-outline-danger" onclick="rejectInquiry(event,{{ inquiry.id }})" >Reject <i class="fas fa-times text-danger"></i></a>
                                             </div>
+
+                                                
+
+                                            
                                         </td>
+
+                                        <script>
+
+
+
+                                            function approveInquiry(event,inquiryId){
+                                                inquiy_url = `/api/inquiries/${inquiryId}/`;
+                                                event.preventDefault();
+                                                console.log("Reject Button clicked" + inquiryId)
+
+                                                fetch(inquiy_url,{
+                                                    method : 'PATCH',
+                                                    headers : {
+                                                        'Content-Type' : 'application/json',
+                                                        'X-CSRFToken' : csrftoken
+                                                    },
+                                                    body : JSON.stringify(
+                                                        {
+                                                            "is_approved": true
+                                                        }
+                                                    )
+                                                })
+                                                .then(response => {
+                                                    if(response.ok){
+                                                        console.log("Successfully Approved" + inquiryId)
+                                                        alert("Successfully Approved" + inquiryId)
+                                                        location.reload()
+                                                    }
+                                                    else{
+                                                        console.log("Error Occur When Approving " + inquiryId)
+                                                        alert("Error Occur When Approving " + inquiryId)
+                                                        location.reload();
+
+
+                                                    }
+                                                })
+                                                .catch(error => {
+                                                    console.log("Error Occur ",error)
+                                                })
+                                            }
+
+
+
+                                            function rejectInquiry(event,inquiryId){
+                                                inquiy_url = `/api/inquiries/${inquiryId}/`;
+                                                event.preventDefault();
+                                                console.log("Approve Button clicked" + inquiryId)
+
+                                                fetch(inquiy_url,{
+                                                    method : 'PATCH',
+                                                    headers : {
+                                                        'Content-Type' : 'application/json',
+                                                        'X-CSRFToken' : csrftoken
+                                                    },
+                                                    body : JSON.stringify(
+                                                        {
+                                                            "is_approved": false
+                                                        }
+                                                    )
+                                                })
+                                                .then(response => {
+                                                    if(response.ok){
+                                                        console.log("Successfully Rejected" + inquiryId)
+                                                        alert("Successfully Rejected" + inquiryId)
+                                                        location.reload();
+                                                    }
+                                                    else{
+                                                        console.log("Error Occur When Rejecting " + inquiryId)
+                                                        alert("Error Occur When Rejecting " + inquiryId)
+                                                        location.reload();
+
+
+                                                    }
+                                                })
+                                                .catch(error => {
+                                                    console.log("Error Occur ",error)
+                                                })
+                                            }
+                                        </script>
+
+                                        <td>
+
+                                            {% if inquiry.is_replied %}
+
+                                                <span class="badge bg-success"> Purchased </span>
+
+                                            {% else %}
+
+                                                <span class="badge bg-warning" > Not Yeah Payment </span>
+
+                                            {% endif %}
+
+                                        </td>
+
                                     </tr>
                                     {% empty %}
                                     <tr>
@@ -391,24 +400,16 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
 
             <!-- Reviews Section -->
-            <div id="reviews-section" class="py-4">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">Property Reviews</h1>
+            <section id="reviews-section" class="mb-5">
+                <div class="d-flex justify-content-between align-items-center pb-2 mb-3 border-bottom">
+                    <h2 class="h4 fw-bold">Property Reviews</h2>
                 </div>
-
-                <div class="card shadow">
-                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Customer Reviews</h5>
-                        <div>
-                            <select class="form-select form-select-sm" style="width: auto;">
-                                <option>All Reviews</option>
-                                <option>Approved</option>
-                                <option>Pending</option>
-                            </select>
-                        </div>
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0">Customer Reviews</h6>
                     </div>
                     <div class="card-body">
                         {% for review in property_reviews %}
@@ -431,15 +432,6 @@
                                     {{ review.created_at|date:"M d, Y" }}
                                 </div>
                             </div>
-                            {% comment %}
-                            <p class="mt-2">{{ review.comment }}</p>
-                            <div class="d-flex justify-content-end">
-                                {% if not review.is_approved %}
-                                <a href="{% url 'approve_review' review.id %}" class="btn btn-sm btn-success me-2">Approve</a>
-                                {% endif %}
-                                <a href="{% url 'delete_review' review.id %}" class="btn btn-sm btn-danger">Delete</a>
-                            </div>
-                            {% endcomment %}
                         </div>
                         {% empty %}
                         <div class="text-center py-4">
@@ -448,15 +440,279 @@
                         {% endfor %}
                     </div>
                 </div>
+            </section>
+
+<!-- Profile -->
+<div id="profile" >
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <div class="row align-items-center">
+            <!-- Column 1: Logo & Basic -->
+            <div class="col-md-4 text-center mb-3 mb-md-0">
+                {% if user.agency_profile.agency_logo %}
+                    <img src="{{ user.agency_profile.agency_logo.url }}" class="rounded-circle border mb-2" width="90" height="90" alt="Agency Logo">
+                {% else %}
+                    <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mb-2 mx-auto" style="width:90px; height:90px;">
+                        <span class="text-white">No Logo</span>
+                    </div>
+                {% endif %}
+                <h5 class="mb-1">{{ user.agency_profile.agency_name }}</h5>
+                <div class="text-muted small">{{ user.email }}</div>
+
+
+                    {% if has_profile %}
+                        <button data-bs-toggle="modal" data-bs-target="#editProfileModal" class="btn btn-outline-primary">Edit Profile</button>
+                    {% else %}
+                        <button data-bs-toggle="modal" data-bs-target="#createProfileModal" class="btn btn-outline-success">Create Profile</button>
+                    {% endif %}
+
+
+                    
             </div>
 
-           
+            <!-- Column 2: Contact & License -->
+            <div class="col-md-4 mb-3 mb-md-0">
+                <ul class="list-unstyled text-start text-md-left mb-0">
+                    <li><strong>Contact Person:</strong> {{ user.agency_profile.contact_person }}</li>
+                    <li><strong>Phone:</strong> {{ user.agency_profile.phone|default:"—" }}</li>
+                    <li><strong>Address:</strong> {{ user.agency_profile.address|default:"—" }}</li>
+                    <li><strong>Email:</strong> {{ user.agency_profile.email|default:"—" }}</li>
+                </ul>
+            </div>
 
-
-
-        </main>
+            <!-- Column 3: License & Website -->
+            <div class="col-md-4 text-md-end">
+                <div>
+                    <span class="badge bg-info mb-1">License: {{ user.agency_profile.license_number|default:"—" }}</span>
+                </div>
+                <div>
+                    <span class="badge 
+                        {% if user.agency_profile.license_status == 'APPROVED' %}bg-success
+                        {% elif user.agency_profile.license_status == 'REJECT' %}bg-danger
+                        {% else %}bg-warning text-dark{% endif %}">
+                        {{ user.agency_profile.get_license_status_display }}
+                    </span>
+                </div>
+                <div class="mt-2">
+                    <strong>Website:</strong>
+                    {% if user.agency_profile.website %}
+                        <a href="{{ user.agency_profile.website }}" target="_blank">{{ user.agency_profile.website }}</a>
+                    {% else %}
+                        —
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+</div>
+
+
+
+
+
+{% comment %}
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="post" enctype="multipart/form-data" id="edit-profile-form">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProfileLabel">Edit Agency Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="editAgencyName" class="form-label">Agency Name</label>
+                            <input type="text" class="form-control" id="editAgencyName" name="agency_name"
+                                value="{{ user.agency_profile.agency_name }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editContactPerson" class="form-label">Contact Person</label>
+                            <input type="text" class="form-control" id="editContactPerson" name="contact_person"
+                                value="{{ user.agency_profile.contact_person }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editPhone" class="form-label">Phone</label>
+                            <input type="text" class="form-control" id="editPhone" name="phone"
+                                value="{{ user.agency_profile.phone }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="editEmail" name="email"
+                                value="{{ user.agency_profile.email }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editLicenseNumber" class="form-label">License Number</label>
+                            <input type="text" class="form-control" id="editLicenseNumber" name="license_number"
+                                value="{{ user.agency_profile.license_number }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editLicenseStatus" class="form-label">License Status</label>
+                            <select class="form-select" id="editLicenseStatus" name="license_status">
+                                {% for val, label in user.agency_profile.LICENSE_STATUS %}
+                                    <option value="{{ val }}"
+                                        {% if user.agency_profile.license_status == val %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label for="editAddress" class="form-label">Address</label>
+                            <textarea class="form-control" id="editAddress" name="address" rows="2">{{ user.agency_profile.address }}</textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editWebsite" class="form-label">Website</label>
+                            <input type="url" class="form-control" id="editWebsite" name="website"
+                                value="{{ user.agency_profile.website }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editAgencyLogo" class="form-label">Agency Logo</label>
+                            <input type="file" class="form-control" id="editAgencyLogo" name="agency_logo">
+                            {% if user.agency_profile.agency_logo %}
+                                <div class="mt-2">
+                                    <img src="{{ user.agency_profile.agency_logo.url }}" width="60" class="rounded-circle border">
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="post" enctype="multipart/form-data" id="edit-profile-form">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProfileLabel">Edit Agency Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        {% for field in profile_form %}
+                            <div class="col-md-6 {% if field.name == 'address' or field.name == 'agency_logo' %}col-12{% endif %}">
+                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.help_text %}
+                                    <div class="form-text">{{ field.help_text }}</div>
+                                {% endif %}
+                                {% for error in field.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                                {% if field.name == 'agency_logo' and agency_profile.agency_logo %}
+                                    <div class="mt-2">
+                                        <img src="{{ agency_profile.agency_logo.url }}" width="60" class="rounded-circle border">
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" name="edit_profile" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endcomment %}
+
+<!-- Profile Create and Edit Modal -->
+<div>
+{% if has_profile %}
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="post" enctype="multipart/form-data" id="edit-profile-form">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProfileLabel">Edit Agency Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        {% for field in profile_form %}
+                            <div class="col-md-6 {% if field.name == 'address' or field.name == 'agency_logo' %}col-12{% endif %}">
+                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.help_text %}
+                                    <div class="form-text">{{ field.help_text }}</div>
+                                {% endif %}
+                                {% for error in field.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                                {% if field.name == 'agency_logo' and agency_profile.agency_logo %}
+                                    <div class="mt-2">
+                                        <img src="{{ agency_profile.agency_logo.url }}" width="60" class="rounded-circle border">
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" name="edit_profile" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% else %}
+<!-- Create Profile Modal -->
+<div class="modal fade" id="createProfileModal" tabindex="-1" aria-labelledby="createProfileLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="post" enctype="multipart/form-data" id="create-profile-form">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createProfileLabel">Create Agency Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        {% for field in profile_form %}
+                            <div class="col-md-6 {% if field.name == 'address' or field.name == 'agency_logo' %}col-12{% endif %}">
+                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.help_text %}
+                                    <div class="form-text">{{ field.help_text }}</div>
+                                {% endif %}
+                                {% for error in field.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" name="create_profile" class="btn btn-primary">Create Profile</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+</div>
+
+
 
 
 
@@ -728,37 +984,27 @@
 
 
 
+        </main>
+    </div>
+</div>
 
+<!-- AJAX JS for Edit Property (same as before) -->
 <script>
-
 document.addEventListener('submit', function(e) {
     if (e.target.classList.contains('edit-form')) {
         e.preventDefault();
         const form = e.target;
-        // ... rest of your AJAX code ...
-    }
-});
-
-
-document.querySelectorAll('.edit-form').forEach(form => {
-    form.addEventListener('submit', function (e) {
-        e.preventDefault();
-
-        const submitBtn = this.querySelector('button[type="submit"]');
+        const submitBtn = form.querySelector('button[type="submit"]');
         const originalText = submitBtn.innerHTML;
-        
-        // Disable button and show loading state
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-
-        const propertyId = this.dataset.propertyId;
+        const propertyId = form.dataset.propertyId;
         const url = `/api/properties/${propertyId}/`;
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
         fetch(url, {
             method: 'PATCH',
             headers: { 'X-CSRFToken': csrfToken },
-            body: new FormData(this)
+            body: new FormData(form)
         })
         .then(response => {
             if (response.ok) return response.json();
@@ -766,8 +1012,7 @@ document.querySelectorAll('.edit-form').forEach(form => {
         })
         .then(data => {
             alert("Updated successfully!");
-            // Optional: Update UI without full reload
-            location.reload(); // Remove if using dynamic updates
+            location.reload();
         })
         .catch(error => {
             alert(error.message || "Update failed. Check console.");
@@ -777,15 +1022,77 @@ document.querySelectorAll('.edit-form').forEach(form => {
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalText;
         });
-    });
+    }
 });
+
+
+
+
+function deleteProperty(event,propertyId) {
+    event.preventDefault();
+
+     if (!confirm("Are you sure you want to delete this property?")) {
+        return;
+    }
+    
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    property_url = `/api/property/${propertyId}/`;
+
+    fetch ( property_url,{
+        method : 'DELETE',
+        headers : {
+            'Content-Type':'application/json',
+            'X-CSRFToken': csrfToken
+        }
+    } )
+    .then(response =>{
+        console.log(response)
+
+        if(response.ok){
+            console.log("Successfully Deleted Property" + propertyId)
+            alert("Successfully Deleted Property" + propertyId)
+            location.reload()
+        }
+        else{
+            console.log("Error Occur When Deleting Property" + propertyId)
+            alert("Error Occur When Deleting Property" + propertyId)
+            location.reload()
+        }
+    })
+    .catch(error => {
+        console.log("Error Occur",error)
+    })
+}
+
+
 
 </script>
 
-
-
-
-
-
+<style>
+.sidebar {
+    min-height: 100vh;
+    box-shadow: 2px 0 8px rgba(0,0,0,.04);
+    z-index: 100;
+}
+.sidebar .nav-link {
+    color: #333;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: background .2s;
+}
+.sidebar .nav-link.active, .sidebar .nav-link:hover {
+    background: #e9ecef;
+    color: #1a73e8;
+    font-weight: 600;
+}
+.sidebar .nav-link i {
+    width: 20px;
+    text-align: center;
+}
+.sidebar .nav-link.text-danger:hover {
+    background: #f8d7da;
+    color: #b71c1c;
+}
+</style>
 
 {% endblock %}
