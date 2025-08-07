@@ -27,9 +27,7 @@ class AgencyProfileViewSet(viewsets.ModelViewSet):
     queryset = AgencyProfile.objects.all()
     serializer_class = AgencyProfileSerializer
 
-class OwnerProfileViewSet(viewsets.ModelViewSet):
-    queryset = OwnerProfile.objects.all()
-    serializer_class = OwnerProfileSerializer
+
 
 class RegionViewSet(viewsets.ModelViewSet):
     queryset = Region.objects.all()

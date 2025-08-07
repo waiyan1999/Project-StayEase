@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from myapp.models import (
-    CustomerProfile, AgencyProfile, OwnerProfile,
+    CustomerProfile, AgencyProfile,
     Region, City, Property, Review, SaveProperty, Inquiry
 )
 
@@ -22,10 +22,7 @@ class AgencyProfileSerializer(serializers.ModelSerializer):
         model = AgencyProfile
         fields = '__all__'
 
-class OwnerProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = OwnerProfile
-        fields = '__all__'
+
 
 class RegionSerializer(serializers.ModelSerializer):
     class Meta:

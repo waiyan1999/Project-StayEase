@@ -3,7 +3,6 @@ from api.views import (
     CustomUserViewSet,
     CustomerProfileViewSet,
     AgencyProfileViewSet,
-    OwnerProfileViewSet,
     RegionViewSet,
     CityViewSet,
     PropertyViewSet,
@@ -43,10 +42,7 @@ urlpatterns = [
     path('agencies/', AgencyProfileViewSet.as_view({'get': 'list', 'post': 'create'}), name='agency-list'),
     path('agencies/<int:pk>/', AgencyProfileViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update', 'delete': 'destroy'}), name='agency-detail'),
 
-    # OwnerProfile
-    path('owners/', OwnerProfileViewSet.as_view({'get': 'list', 'post': 'create'}), name='owner-list'),
-    path('owners/<int:pk>/', OwnerProfileViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update', 'delete': 'destroy'}), name='owner-detail'),
-
+    
     # Region
     path('regions/', RegionViewSet.as_view({'get': 'list', 'post': 'create'}), name='region-list'),
     path('regions/<int:pk>/', RegionViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update', 'delete': 'destroy'}), name='region-detail'),

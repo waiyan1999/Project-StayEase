@@ -4,7 +4,6 @@ from .models import (
     CustomUser,
     CustomerProfile,
     AgencyProfile,
-    OwnerProfile,
     Region,
     City,
     Property,
@@ -64,22 +63,6 @@ class AgencyProfileForm(forms.ModelForm):
             'agency_logo': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
 
-# --------------------
-# 3. Owner Profile Form
-# --------------------
-class OwnerProfileForm(forms.ModelForm):
-    class Meta:
-        model = OwnerProfile
-        fields = [
-            'owner_name',
-            'address',
-            'owner_photo'
-        ]
-        widgets = {
-            'owner_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'owner_photo': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-        }
 
 # --------------------
 # 4. Region & City Forms

@@ -8,7 +8,7 @@ class CustomUser(AbstractUser):
         ('ADMIN', 'Administrator'),
         ('CUSTOMER', 'Customer'),
         ('AGENCY', 'Agency'),
-        ('OWNER', 'Property Owner'),
+   
     )
     
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='CUSTOMER')
@@ -54,14 +54,7 @@ class AgencyProfile(models.Model):
     def __str__(self):
         return f'Agency: {self.agency_name}'
 
-class OwnerProfile(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='owner_profile')
-    owner_name = models.CharField(max_length=100)
-    address = models.TextField(blank=True)
-    owner_photo = models.ImageField(upload_to='owner_profiles/', blank=True)
-    
-    def __str__(self):
-        return f'Owner: {self.owner_name}'
+
 
 class Region(models.Model):
     name = models.CharField(max_length=50, unique=True)

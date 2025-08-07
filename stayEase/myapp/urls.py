@@ -9,12 +9,11 @@ urlpatterns = [
     path('agency/',views.AgencyView.as_view(),name='agency'),
     path('agency-detail/<int:pk>/',views.AgencyDetailView.as_view(),name='agency_detail'),
     
-    path('owner/',views.OwnerView.as_view(),name='owner'),
-    path('onwer-detail/<int:pk>/',views.OwnerDetailview.as_view(),name='owner_detail'),
+   
     
     path('location/',views.LocationView.as_view(),name='location'),
     
-    #path('service/',views.ServiceView.as_view(),name='service'),
+   
     
     path('login-user/',views.login_user, name='login_user'),
     

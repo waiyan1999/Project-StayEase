@@ -3,8 +3,8 @@ from django.views import View
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate
-from .models import Property, AgencyProfile, OwnerProfile, Region, City, CustomUser,SaveProperty,Inquiry
-from myapp.form import CustomerProfileForm, AgencyProfileForm, OwnerProfileForm, RegionForm, CityForm, PropertyForm,ReviewForm,UserRegistrationForm,InquiryForm
+from .models import Property, AgencyProfile,Region, City, CustomUser,SaveProperty,Inquiry
+from myapp.form import CustomerProfileForm, AgencyProfileForm,RegionForm, CityForm, PropertyForm,ReviewForm,UserRegistrationForm,InquiryForm
 from django.db.models import Avg
 
 from django.contrib.admin.models import LogEntry
@@ -138,8 +138,6 @@ def index(request):
         elif request.user.role == 'AGENCY':
             return redirect('agency_dashboard')
         
-        elif request.user.role == 'OWNER':
-            return redirect('agency_dashboard')
         
         elif request.user.role == 'ADMIN':
             return redirect('admindashobard')
@@ -380,17 +378,9 @@ class AgencyDetailView(View):
         
         
 
-class OwnerView(View):
-    def get(self, request):
-        owners = OwnerProfile.objects.all()
-        context = {'owners': owners}
-        return render(request, 'owner.html', context)
 
-class OwnerDetailview(View):
-    def get(self, request, pk):
-        owner = get_object_or_404(OwnerProfile, id=pk)
-        context = {'owner': owner}
-        return render(request, 'owner-detail.html', context)
+
+
 
 class LocationView(View):
     def get(self, request):
@@ -531,6 +521,9 @@ class ProfileView(View):
         is_purchased=True,
         property__status='RENTED'
     ).select_related('property')
+        
+        save_property_list = SaveProperty.objects.filter(user=request.user).values_list('property_id', flat=True)
+        saved_porperties = SaveProperty.objects.filter(user = request.user)
 
         return render(request, 'profile.html', {
             'form': form,

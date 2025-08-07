@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, CustomerProfile, AgencyProfile, OwnerProfile, Property, Review
+from .models import User, CustomerProfile, AgencyProfile,Property, Review
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -16,10 +16,6 @@ class AgencyProfileSerializer(serializers.ModelSerializer):
         model = AgencyProfile
         fields = ['id', 'user', 'agency_name', 'contact_person', 'license_number', 'address', 'website', 'agency_logo']
 
-class OwnerProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = OwnerProfile
-        fields = ['id', 'user', 'owner_name', 'address', 'owner_photo']
 
 class PropertySerializer(serializers.ModelSerializer):
     class Meta:
